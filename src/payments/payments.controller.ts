@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Query, UseGuards, Req } from "@nestjs/common"
-import type { PaymentsService, PaymentStatus } from "./payments.service"
+import  { PaymentsService, PaymentStatus } from "./payments.service"
 import type { CreatePaymentDto, PaymentFilterDto } from "./dto/payment.dto"
 import { JwtAuthGuard } from "~/common/guards/jwt-auth.guard"
 import { RolesGuard } from "~/common/guards/roles.guard"

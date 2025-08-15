@@ -1,15 +1,18 @@
 import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common"
 import type { Repository } from "typeorm"
-import { type User, type Product, type Order, OrderStatus } from "~/entity"
+import { Product, User } from "~/entity"
 import { UserRole } from "~/common/enums/role.enum"
+import { Order, OrderStatus } from "~/orders/entities/order.entity"
+import { InjectRepository } from "@nestjs/typeorm"
 
 @Injectable()
 export class VendorService {
+
   private userRepo: Repository<User>
   private productRepo: Repository<Product>
   private orderRepo: Repository<Order>
 
-  constructor(userRepo: Repository<User>, productRepo: Repository<Product>, orderRepo: Repository<Order>) {
+  constructor(@InjectRepository(User) userRepo: Repository<User>, @InjectRepository(Product) productRepo: Repository<Product>, @InjectRepository(Order) orderRepo: Repository<Order>) {
     this.userRepo = userRepo
     this.productRepo = productRepo
     this.orderRepo = orderRepo

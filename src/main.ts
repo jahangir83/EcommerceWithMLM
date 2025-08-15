@@ -1,12 +1,18 @@
+import 'reflect-metadata';
 import { NestFactory } from "@nestjs/core"
 import { AppModule } from "./app.module"
 import { BadRequestException, ValidationPipe } from "@nestjs/common"
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger"
 import * as dotenv from "dotenv"
+import cookieParser from 'cookie-parser';
+
 dotenv.config()
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
+
+  //Cookie parser
+
 
   // Enable CORS
   app.enableCors({
@@ -22,7 +28,7 @@ async function bootstrap() {
     transform: true,
     exceptionFactory: (error) => {
       const messages = error.map((err) => {
-        console.log(err)
+      
         const constraints = Object.values(err.constraints || {}).join(",")
         return { [err.property]: constraints }
       })
@@ -69,6 +75,7 @@ async function bootstrap() {
   })
 
   const port = process.env.PORT || 3001
+  app.use(cookieParser())
   await app.listen(port)
 
   console.log(`🚀 Backend server running on: http://localhost:${port}`)

@@ -9,8 +9,7 @@ import {
   UserProfile,
   AccountBalance,
   Wallet,
-  Order,
-  Payment,
+
   Withdrawal,
   Transaction,
   Course,
@@ -21,21 +20,22 @@ import {
   LeaderShipDisignation,
   Product,
   Category,
-  OrderItem,
-} from "~/entity/index"
+} from "./entity/index"
 
 import { AppController } from "./app.controller"
+import { Order } from "./orders/entities/order.entity"
+import { Payment } from "./payments/entities/payment.entity"
+import { OrderItem } from "./orders/entities/order-item.entity"
 import { ProductsModule } from "./products/products.module"
 import { OrdersModule } from "./orders/orders.module"
 import { PaymentsModule } from "./payments/payments.module"
 import { TransactionsModule } from "./transactions/transactions.module"
-import { ProductServicesModule } from "./product-services/product-services.module"
-import { CoreServiceModule } from "./core-service/core-service.module"
 import { MlmModule } from "./mlm/mlm.module"
 import { VendorModule } from "./vendor/vendor.module"
 import { AdminModule } from "./admin/admin.module"
 import { NotificationsModule } from "./notifications/notifications.module"
 import { ReportsModule } from "./reports/reports.module"
+import { CoreServiceModule } from "./core-service/core-service.module"
 
 @Module({
   imports: [
@@ -56,7 +56,7 @@ import { ReportsModule } from "./reports/reports.module"
         type: "postgres",
         url: configService.get<string>("DATABASE_URL"),
         synchronize: true,
-        logging: configService.get<string>("NODE_ENV") === "development",
+        // logging: configService.get<string>("NODE_ENV") === "development",
         entities: [
           User,
           UserProfile,
@@ -85,7 +85,7 @@ import { ReportsModule } from "./reports/reports.module"
     OrdersModule,
     PaymentsModule,
     TransactionsModule,
-    ProductServicesModule,
+    ProductsModule,
     CoreServiceModule,
     MlmModule,
     VendorModule,

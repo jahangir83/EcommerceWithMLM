@@ -1,5 +1,5 @@
 import { Controller, Get, Patch, Param, Delete, Query, UseGuards } from "@nestjs/common"
-import type { NotificationsService } from "./notifications.service"
+import  { NotificationsService } from "./notifications.service"
 import { JwtAuthGuard } from "~/common/guards/jwt-auth.guard"
 import type { AuthenticateRequest } from "~/common/types/user.type"
 

@@ -1,5 +1,6 @@
 import { IsString, IsNumber, IsEnum, IsOptional, IsUUID, IsObject, Min } from "class-validator"
-import { PaymentStatus } from "../payments.service"
+import { PaymentStatus } from "../entities/payment.entity"
+
 
 export class CreatePaymentDto {
   @IsUUID()

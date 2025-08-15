@@ -9,7 +9,7 @@ import {
 
 export interface UserInterface {
   id: string;
-  name: string;
+  username: string;
   email?: string | null;
   phone: string;
   password: string;
@@ -19,9 +19,9 @@ export interface UserInterface {
   referrals?: UserInterface[]; // recursive interface
   referredBy?: UserInterface | null; // optional and nullable
   generation: number;
-  leadershipId: number;
-  designation: string;
-  totalDirectReferrals: number;
+  leadershipId?: number;
+  designation?: string;
+  totalDirectReferrals?: number;
   isActive: boolean;
   avatar?: string | null;
   status?: UserStatus;
@@ -35,8 +35,8 @@ export interface UserInterface {
 
   course?: Course | null; // optional and nullable
 
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface ProfileInterface {

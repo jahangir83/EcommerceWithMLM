@@ -83,7 +83,7 @@ export class UserService {
       },
       select: {
         id: true,
-        name: true,
+        username: true,
         email: true,
         phone: true,
         role: true,
@@ -97,7 +97,7 @@ export class UserService {
         updatedAt: true,
         referredBy: {
           id: true,
-          name: true,
+          username: true,
         }
       },
       relations: ['referredBy'],

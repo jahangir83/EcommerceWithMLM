@@ -1,11 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm';
 import { Order } from '../../orders/entities/order.entity';
+import { User } from '~/entity';
 
 export enum PaymentStatus {
-  PENDING = 'pending',
-  SUCCESS = 'success',
-  FAILED = 'failed',
-  REFUNDED = 'refunded',
+  PENDING = "pending",
+  PROCESSING = "processing",
+  SUCCESS = "success",
+  FAILED = "failed",
+  CANCELLED = "cancelled",
+  REFUNDED = "refunded",
+  CAPTURED = 'captured'
 }
 
 @Entity()
@@ -16,6 +20,10 @@ export class Payment {
   @ManyToOne(() => Order, { nullable: false })
   order: Order;
 
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'userId' })
+  user: User;
+
   @Column({ type: 'enum', enum: PaymentStatus, default: PaymentStatus.PENDING })
   status: PaymentStatus;
 
@@ -25,12 +33,18 @@ export class Payment {
   @Column({ nullable: true })
   method: string; // card, bkash, nagad, stripe
 
+    @Column({ length: 10 })
+  currency: string;
+
   @Column({ nullable: true })
   gatewayReference: string;
 
   @Column({ type: 'json', nullable: true })
   gatewayResponse: any;
 
-  @CreateDateColumn()
-  createdAt: Date;
+  @Column({type:"jsonb", nullable: true})
+  metadata:any
+
+ @CreateDateColumn() createdAt: Date;
+  @UpdateDateColumn() updatedAt: Date;
 }

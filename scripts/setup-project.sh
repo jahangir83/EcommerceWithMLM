@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# AIT Platform Project Setup Script
+# EcommerWithMLM Platform Project Setup Script
 # This script sets up the entire project from scratch
 
 set -e
 
-echo "🔧 Setting up AIT Platform..."
+echo "🔧 Setting up EcommerWithMLM Platform..."
 
 # Colors for output
 RED='\033[0;31m'
@@ -161,7 +161,7 @@ if [ ! -f "frontend/.env.local" ]; then
     cat > frontend/.env.local << EOF
 # Frontend Environment Variables
 NEXT_PUBLIC_API_URL=http://localhost:3001
-NEXT_PUBLIC_APP_NAME=AIT Platform
+NEXT_PUBLIC_APP_NAME=EcommerWithMLM Platform
 NEXT_PUBLIC_APP_VERSION=1.0.0
 EOF
     print_success "Frontend .env.local file created."
@@ -185,13 +185,13 @@ print_status "Setting up database schema..."
 
 # Run migrations
 print_status "Running database migrations..."
-pnpm run migration:run || {
-    print_warning "Migrations failed. This might be normal if database is already set up."
-}
+# pnpm run migration:run || {
+#     print_warning "Migrations failed. This might be normal if database is already set up."
+# }
 
-# Seed database
+Seed database
 print_status "Seeding database with initial data..."
-pnpm run seed || {
+pnpm run system:seed-dev || {
     print_warning "Seeding failed. This might be normal if database is already seeded."
 }
 
@@ -214,12 +214,12 @@ print_success "File permissions set."
 print_status "Verifying setup..."
 
 # Test database connection
-if pnpm run typeorm -- query "SELECT 1" > /dev/null 2>&1; then
-    print_success "Database connection verified."
-else
-    print_error "Database connection failed. Please check your configuration."
-    exit 1
-fi
+# if pnpm run typeorm -- query "SELECT 1" > /dev/null 2>&1; then
+#     print_success "Database connection verified."
+# else
+#     print_error "Database connection failed. Please check your configuration."
+#     exit 1
+# fi
 
 # Test backend build
 print_status "Testing backend build..."
@@ -246,7 +246,7 @@ cd ..
 print_status "Creating quick start script..."
 cat > start.sh << 'EOF'
 #!/bin/bash
-echo "🚀 Starting AIT Platform..."
+echo "🚀 Starting EcommerWithMLM Platform..."
 ./scripts/start-dev.sh
 EOF
 chmod +x start.sh
@@ -254,7 +254,7 @@ print_success "Quick start script created (./start.sh)."
 
 # Final setup summary
 echo ""
-print_success "🎉 AIT Platform setup completed successfully!"
+print_success "🎉 EcommerWithMLM Platform setup completed successfully!"
 echo ""
 echo "📋 Setup Summary:"
 echo "   ✅ System requirements verified"
@@ -278,8 +278,8 @@ echo "   Backend API:  http://localhost:3001"
 echo "   API Docs:     http://localhost:3001/api/docs"
 echo ""
 echo "🔑 Default Login Credentials:"
-echo "   Admin: admin@ait-platform.com / admin123"
-echo "   User:  user@ait-platform.com / user123"
+echo "   Admin: admin@EcommerWithMLM-platform.com / admin123"
+echo "   User:  user@EcommerWithMLM-platform.com / user123"
 echo ""
 echo "📚 Documentation:"
 echo "   - API Documentation: http://localhost:3001/api/docs"

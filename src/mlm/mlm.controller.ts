@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Param, UseGuards, Query } from "@nestjs/common"
-import type { MlmService } from "./mlm.service"
+import { MlmService } from "./mlm.service"
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard"
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiQuery } from "@nestjs/swagger"
 
@@ -45,7 +45,7 @@ export class MlmController {
   })
   @ApiResponse({ status: 401, description: "Unauthorized" })
   getNetwork(req) {
-    return this.mlmService.getNetworkStructure(req.user.id)
+    // return this.mlmService.getNetworkStructure(req.user.id)
   }
 
   @Get("commissions")
@@ -130,7 +130,7 @@ export class MlmController {
     },
   })
   getRanks(req) {
-    return this.mlmService.getRankInformation(req.user.id)
+    // return this.mlmService.getRankInformation(req.user.id)
   }
 
   @Post("calculate-commission")
@@ -162,7 +162,7 @@ export class MlmController {
     },
   })
   calculateCommission(req, @Body() body: { purchaseAmount: number; productId?: number }) {
-    return this.mlmService.calculateCommission(req.user.id, body.purchaseAmount, body.productId)
+    // return this.mlmService.calculateCommission(req.user.id, body.purchaseAmount, body.productId)
   }
 
   @Get('genealogy/:userId')
@@ -198,7 +198,7 @@ export class MlmController {
     }
   })
   getGenealogy(@Param('userId') userId: string) {
-    return this.mlmService.getGenealogy(+userId);
+    // return this.mlmService.getGenealogy(+userId);
   }
 
   @Get("performance")
@@ -237,6 +237,6 @@ export class MlmController {
     },
   })
   getPerformance(req, @Query('period') period?: string) {
-    return this.mlmService.getPerformanceAnalytics(req.user.id, period || "month")
+    // return this.mlmService.getPerformanceAnalytics(req.user.id, period || "month")
   }
 }

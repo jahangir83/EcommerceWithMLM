@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Patch, Param, Delete, Query, UseGuards } from "@nestjs/common"
-import type { ProductsService } from "./products.service"
-import type { CreateProductDto } from "./dto/product.dto"
-import type { UpdateProductDto } from "./dto/product.dto"
+import { ProductsService } from "./products.service"
+import  { CreateProductDto } from "./dto/product.dto"
+import  { UpdateProductDto } from "./dto/product.dto"
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard"
 import { RolesGuard } from "../common/guards/roles.guard"
 import { Roles } from "../common/decorators/roles.decorator"
-import { Role } from "../common/enums/role.enum"
+import { UserRole } from "../common/enums/role.enum"
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery, ApiParam } from "@nestjs/swagger"
 
 @ApiTags("Products")
@@ -15,7 +15,7 @@ export class ProductsController {
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.VENDOR, Role.ADMIN)
+  @Roles(UserRole.VENDOR, UserRole.ADMIN)
   @ApiBearerAuth("JWT-auth")
   @ApiOperation({ summary: "Create a new product" })
   @ApiResponse({
@@ -101,8 +101,8 @@ export class ProductsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get product by ID' })
   @ApiParam({ name: 'id', description: 'Product ID' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Product found',
     schema: {
       example: {
@@ -138,12 +138,13 @@ export class ProductsController {
   })
   @ApiResponse({ status: 404, description: 'Product not found' })
   findOne(@Param('id') id: string) {
-    return this.productsService.findOne(+id);
+    //TODO: We should fix type
+    return this.productsService.findOne(+id as any);
   }
 
   @Patch(":id")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.VENDOR, Role.ADMIN)
+  @Roles(UserRole.VENDOR, UserRole.ADMIN)
   @ApiBearerAuth("JWT-auth")
   @ApiOperation({ summary: "Update product" })
   @ApiParam({ name: "id", description: "Product ID" })
@@ -152,12 +153,13 @@ export class ProductsController {
   @ApiResponse({ status: 403, description: "Forbidden" })
   @ApiResponse({ status: 404, description: "Product not found" })
   update(@Param('id') id: string, updateProductDto: UpdateProductDto) {
-    return this.productsService.update(+id, updateProductDto)
+    //TODO: We should fix type
+    return this.productsService.update(+id as any, updateProductDto)
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.VENDOR, Role.ADMIN)
+  @Roles(UserRole.VENDOR, UserRole.ADMIN)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Delete product' })
   @ApiParam({ name: 'id', description: 'Product ID' })
@@ -166,6 +168,7 @@ export class ProductsController {
   @ApiResponse({ status: 403, description: 'Forbidden' })
   @ApiResponse({ status: 404, description: 'Product not found' })
   remove(@Param('id') id: string) {
-    return this.productsService.remove(+id);
+    //TODO: We should fix type
+    return this.productsService.remove(+id as any);
   }
 }

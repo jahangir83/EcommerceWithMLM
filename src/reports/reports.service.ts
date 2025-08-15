@@ -1,16 +1,23 @@
 import { Injectable } from "@nestjs/common"
+import { InjectRepository } from "@nestjs/typeorm"
 import { type Repository, Between } from "typeorm"
-import { type User, type Order, type Transaction, type RevenueShare, type Product, OrderStatus } from "~/entity"
+import { Product, RevenueShare, Transaction, User } from "~/entity"
+import { Order, OrderStatus } from "~/orders/entities/order.entity"
 
 @Injectable()
 export class ReportsService {
   constructor(
+    @InjectRepository(User)
     private userRepo: Repository<User>,
+    @InjectRepository(Order)
     private orderRepo: Repository<Order>,
+    @InjectRepository(Transaction)
     private transactionRepo: Repository<Transaction>,
+    @InjectRepository(RevenueShare)
     private revenueShareRepo: Repository<RevenueShare>,
+    @InjectRepository(Product)
     private productRepo: Repository<Product>,
-  ) {}
+  ) { }
 
   async getSalesReport(startDate: Date, endDate: Date) {
     const orders = await this.orderRepo
@@ -94,7 +101,7 @@ export class ReportsService {
     const earnerStats = {}
     commissions.forEach((comm) => {
       const userId = comm.recipientUser.id
-      const userName = comm.recipientUser.name
+      const userName = comm.recipientUser.username
       if (!earnerStats[userId]) {
         earnerStats[userId] = { name: userName, total: 0, count: 0 }
       }

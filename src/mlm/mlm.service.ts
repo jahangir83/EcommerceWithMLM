@@ -1,13 +1,18 @@
 import { Injectable, NotFoundException } from "@nestjs/common"
+import { InjectRepository } from "@nestjs/typeorm"
 import type { Repository } from "typeorm"
-import type { User, RevenueShare, Transaction, LeaderShipDisignation } from "~/entity"
+import { User, RevenueShare, Transaction, LeaderShipDisignation } from "~/entity"
 
 @Injectable()
 export class MlmService {
   constructor(
+    @InjectRepository(User)
     private userRepo: Repository<User>,
+    @InjectRepository(RevenueShare)
     private revenueShareRepo: Repository<RevenueShare>,
+    @InjectRepository(Transaction)
     private transactionRepo: Repository<Transaction>,
+    @InjectRepository(LeaderShipDisignation)
     private leadershipRepo: Repository<LeaderShipDisignation>,
   ) {}
 
@@ -25,7 +30,7 @@ export class MlmService {
       if (currentLevel >= levels) {
         return {
           id: currentUser.id,
-          name: currentUser.name,
+          name: currentUser.username,
           level: currentLevel,
           directReferrals: currentUser.totalDirectReferrals,
           isActive: currentUser.isActive,
@@ -42,7 +47,7 @@ export class MlmService {
 
       return {
         id: currentUser.id,
-        name: currentUser.name,
+        name: currentUser.username,
         level: currentLevel,
         directReferrals: currentUser.totalDirectReferrals,
         isActive: currentUser.isActive,
@@ -57,7 +62,7 @@ export class MlmService {
     return {
       user: {
         id: user.id,
-        name: user.name,
+        name: user.username,
         level: 0,
         directReferrals: user.totalDirectReferrals,
         totalNetwork,

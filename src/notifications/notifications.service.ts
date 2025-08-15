@@ -1,14 +1,15 @@
 import { Injectable, NotFoundException } from "@nestjs/common"
 import type { Repository } from "typeorm"
-import { type Notification, NotificationType } from "./entities/notification.entity"
-import type { User } from "~/entity"
+import { Notification, NotificationType } from "./entities/notification.entity"
+import { User } from "~/entity"
+import { InjectRepository } from "@nestjs/typeorm"
 
 @Injectable()
 export class NotificationsService {
   private notificationRepo: Repository<Notification>
   private userRepo: Repository<User>
 
-  constructor(notificationRepo: Repository<Notification>, userRepo: Repository<User>) {
+  constructor(@InjectRepository(Notification) notificationRepo: Repository<Notification>, @InjectRepository(User) userRepo: Repository<User>) {
     this.notificationRepo = notificationRepo
     this.userRepo = userRepo
   }

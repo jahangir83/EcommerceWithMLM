@@ -1,11 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Query, UseGuards } from "@nestjs/common"
-import type { VendorService } from "./vendor.service"
+import  { VendorService } from "./vendor.service"
 import { JwtAuthGuard } from "~/common/guards/jwt-auth.guard"
 import { RolesGuard } from "~/common/guards/roles.guard"
 import { Roles } from "~/common/decorators/roles.decorator"
 import { UserRole } from "~/common/enums/role.enum"
 import type { AuthenticateRequest } from "~/common/types/user.type"
-import type { OrderStatus } from "~/entity"
+import { OrderStatus } from "~/orders/entities/order.entity"
+
 
 @Controller("vendor")
 @UseGuards(JwtAuthGuard)

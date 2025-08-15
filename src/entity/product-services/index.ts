@@ -1,7 +1,4 @@
 export * from "./subscription.entity"
 export * from "./course.entity"
 export * from "./uddokta.entity"
-export * from "./order.entity"
-export * from "./order-item.entity"
 export * from "./withdrawal.entity"
-export * from "./payment.entity"

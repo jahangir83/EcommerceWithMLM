@@ -12,34 +12,40 @@ import {
 } from 'typeorm';
 import { UserProfile } from './user-profile.entity';
 import { Wallet } from './wallet.entity';
-import { Order } from '../product-services/order.entity';
-import { Payment } from '../product-services/payment.entity';
 import { Withdrawal } from '../product-services/withdrawal.entity';
 import { Transaction } from '../transactions/transaction.entity';
 import { UserRole } from 'src/common/enums/role.enum';
 import { UserStatus } from '~/common/enums/common.enum';
 import { UserInterface } from '~/common/types/user.type';
 import { Course, Subscription, Uddokta } from '../product-services';
+import { Payment } from '~/payments/entities/payment.entity';
+import { Order } from '~/orders/entities/order.entity';
 
 @Entity('users')
 export class User implements UserInterface {
-  @PrimaryGeneratedColumn('uuid') @Index() id: string;
-  @Column() name: string;
-
-  @Column({ nullable: true, unique: true }) email: string;
-
-  @Column({ unique: true }) phone: string;
-
-  @Column() password: string;
-
+  @PrimaryGeneratedColumn('uuid') @Index() 
+  id: string;
+  @Column() 
+  username: string;
+  @Column({ nullable: true, unique: true }) 
+  email: string;
+  @Column({ unique: true }) 
+  phone: string;
+  @Column() 
+  password: string;
   @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
   role: UserRole;
+  @Column({ nullable: true }) 
+  avatar: string;
 
-  @Column({ unique: true, nullable: true }) referralCode: string;
+  @Column({ unique: true, nullable: true }) 
+  referralCode: string;
 
-  @Column({ nullable: true, type: 'uuid' }) referredById: string;
+  @Column({ nullable: true, type: 'uuid' }) 
+  referredById: string;
 
-  @OneToMany(() => User, (u) => u.referredBy) referrals: User[];
+  @OneToMany(() => User, (u) => u.referredBy) 
+  referrals: User[];
 
   @ManyToOne(() => User, (u) => u.referrals)
   @JoinColumn({ name: 'referredById' })
@@ -51,7 +57,6 @@ export class User implements UserInterface {
   @Column({ default: 0 }) totalDirectReferrals: number;
 
   @Column({ default: false }) isActive: boolean;
-  @Column({ nullable: true }) avatar: string;
   @Column({ type: 'enum', enum: UserStatus, nullable: true })
   status: UserStatus;
 

@@ -7,17 +7,26 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '~/entity/index';
+import { User } from '../entity/index';
 import { DataSource, Or, Repository } from 'typeorm';
-import { ReferralCodeDto, RegisterDto } from './dto/register.dto';
+import { RegisterDto } from './dto/register.dto';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
 import { UserRole } from 'src/common/enums/role.enum';
 import { CreateAdminDto } from './dto/admin.dto';
-import { LeaderShipDisignation } from '~/entity/users/leadership-digisnation.entity';
+import { LeaderShipDisignation } from '../entity/users/leadership-digisnation.entity';
+import { UserInactiveException } from '~/common/exceptions/user-inactive.exception';
+
+
+
+type UserShape = { id: number | string; email: string; password?: string; role?: string };
+
+
 
 @Injectable()
 export class AuthService {
+
+
   constructor(
 
     private dataSource: DataSource,
@@ -27,7 +36,21 @@ export class AuthService {
   ) { }
 
 
-  async register(dto: RegisterDto) {
+  public parseExpires(expr: string): number {
+    const m = String(expr).match(/^(\d+)([smhd])$/i);
+    if (!m) return Number(expr) || 0;
+    const v = Number(m[1]);
+    const unit = m[2].toLowerCase();
+    switch (unit) {
+      case 's': return v;
+      case 'm': return v * 60;
+      case 'h': return v * 3600;
+      case 'd': return v * 86400;
+      default: return 0;
+    }
+  }
+
+  async register(dto: RegisterDto): Promise<User> {
     // --- STEP 1: Check for existing email or phone before attempting to create ---
     const existingUserByEmail = await this.userRepo.findOne({
       where: { email: dto.email },
@@ -64,11 +87,11 @@ export class AuthService {
     const hashed = await bcrypt.hash(dto.password, 10);
 
     const user = this.userRepo.create({
-      name: dto.name,
+      username: dto.username,
       email: dto.email,
       phone: dto.phone,
       password: hashed,
-      avatar: dto.avatar,
+      avatar: dto.avater,
       isActive,
       referredBy: referredBy ?? undefined,
       referredById: referredBy?.id,
@@ -91,22 +114,53 @@ export class AuthService {
   }
 
 
-  async login(dto: LoginDto) {
-    const user = await this.userRepo.findOne({ where: { phone: dto.phone } });
+  async validateUser(dto: LoginDto): Promise<UserShape> {
+    const user = await this.userRepo.findOne({
+      where: [
+        { phone: dto.phone },
+        { email: dto.email }
+      ]
+    });
 
     if (!user || !(await bcrypt.compare(dto.password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    if (!user.isActive) {
+      throw new UserInactiveException()
+    }
 
-    const payload = {
-      sub: user.id,
+    const payload: UserShape = {
+      id: user.id,
       email: user.email,
       role: user.role,
     };
-    const token = this.jwtService.sign(payload);
-    return { token };
+
+    return payload
   }
+
+
+  async issueTokens(user: Pick<UserShape, 'id' | 'email' | 'role'>) {
+    const payload = { sub: user.id, email: user.email, role: user.role };
+
+    const access_token = await this.jwtService.signAsync(payload, {
+      secret: process.env.JWT_ACCESS_SECRET || 'access_secret_dev',
+      expiresIn: process.env.JWT_ACCESS_EXPIRES || '15m',
+    });
+
+    const refresh_token = await this.jwtService.signAsync(payload, {
+      secret: process.env.JWT_REFRESH_SECRET || 'refresh_secret_dev',
+      expiresIn: process.env.JWT_REFRESH_EXPIRES || '7d',
+    });
+
+    return {
+      access_token,
+      refresh_token,
+      token_type: 'Bearer',
+      expires_in: this.parseExpires(process.env.JWT_ACCESS_EXPIRES || '15m'),
+    };
+  }
+
 
   generateReferralCode(): string {
     return Math.random().toString(36).substring(2, 8).toUpperCase(); // e.g., 'K9X3T2'
@@ -184,7 +238,7 @@ export class AuthService {
    * @param dto - The data transfer object containing user ID and referral code.
    * @returns A success message.
    */
-  async assignReferralCode(dto: ReferralCodeDto) {
+  async assignReferralCode(dto: { userId: string, referralCode: string }) {
     const user = await this.userRepo.findOne({ where: { id: dto.userId } });
     if (!user) {
       throw new NotFoundException('User not found');
@@ -284,7 +338,7 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
     const admin = this.userRepo.create({
-      name: dto.name,
+      username: dto.username,
       email: dto.email,
       phone: dto.phone,
       password: hashedPassword,
@@ -333,6 +387,13 @@ export class AuthService {
       console.error('Error creating developer:', error);
       throw new BadRequestException('Failed to create developer');
     }
+  }
+
+  async refreshToken(dto: {}): Promise<{ token: string }> {
+    // Example implementation: You should replace this with your actual logic.
+    // For demonstration, we'll just return a dummy token.
+    const token = this.jwtService.sign({ ...dto });
+    return { token };
   }
 
 }

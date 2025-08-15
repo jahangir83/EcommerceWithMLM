@@ -7,9 +7,9 @@ import {
   ValueType,
   WalletType,
 } from '~/common/enums/common.enum';
-import { Order } from '~/entity/product-services/purchase.entity';
 import { TransactionService } from '~/transactions/services/transaction.service';
 import { AccountService } from '~/transactions/services/account.service';
+import { Order, OrderStatus } from '~/orders/entities/order.entity';
 
 @Injectable()
 export class PurchaseService {
@@ -26,55 +26,55 @@ export class PurchaseService {
     totalAmount: number,
     currency = 'BDT',
   ) {
-    const order = this.orderRepo.create({
-      buyer: { id: buyerId } as any,
-      productId,
-      quantity,
-      totalAmount,
-      status: 'pending',
-    });
-    await this.orderRepo.save(order);
+    // const order = this.orderRepo.create({
+    //   user: { id: buyerId } as any,
+    //   productId,
+    //   quantity,
+    //   totalAmount,
+    //   status: OrderStatus.PENDING_PAYMENT,
+    // });
+    // await this.orderRepo.save(order);
 
-    const buyerWallet = await this.accountService.findOrCreateUserWallet(
-      buyerId,
-      WalletType.MONEY,
-      currency,
-    );
-    // ensure platform wallet exists - it's a system-level wallet with no user
-    //TODO: We need to ensure platform wallet is created only once
-    const platformWallet = await this.accountService.findOrCreateUserWallet(
-      null as any,
-      WalletType.MONEY,
-      currency,
-    );
+    // const buyerWallet = await this.accountService.findOrCreateUserWallet(
+    //   buyerId,
+    //   WalletType.MONEY,
+    //   currency,
+    // );
+    // // ensure platform wallet exists - it's a system-level wallet with no user
+    // //TODO: We need to ensure platform wallet is created only once
+    // const platformWallet = await this.accountService.findOrCreateUserWallet(
+    //   null as any,
+    //   WalletType.MONEY,
+    //   currency,
+    // );
 
-    // create transaction: buyer pays -> platform receives
-    const tx = await this.txService.createTransactionWithJournal({
-      userId: buyerId,
-      walletId: buyerWallet.id,
-      type: TransactionType.PURCHASE,
-      valueType: ValueType.MONEY,
-      amount: totalAmount,
-      currency,
-      direction: 'outflow',
-      relatedService: 'product_purchase',
-      relatedEntityId: order.id,
-      metadata: { productId, quantity },
-      journalEntries: [
-        {
-          accountId: platformWallet.id,
-          debit: totalAmount,
-          credit: 0,
-          currency,
-        },
-        { accountId: buyerWallet.id, debit: 0, credit: totalAmount, currency },
-      ],
-    });
+    // // create transaction: buyer pays -> platform receives
+    // const tx = await this.txService.createTransactionWithJournal({
+    //   userId: buyerId,
+    //   walletId: buyerWallet.id,
+    //   type: TransactionType.PURCHASE,
+    //   valueType: ValueType.MONEY,
+    //   amount: totalAmount,
+    //   currency,
+    //   direction: 'outflow',
+    //   relatedService: 'product_purchase',
+    //   relatedEntityId: order.id,
+    //   metadata: { productId, quantity },
+    //   journalEntries: [
+    //     {
+    //       accountId: platformWallet.id,
+    //       debit: totalAmount,
+    //       credit: 0,
+    //       currency,
+    //     },
+    //     { accountId: buyerWallet.id, debit: 0, credit: totalAmount, currency },
+    //   ],
+    // });
 
-    // mark order completed
-    order.status = 'completed';
-    await this.orderRepo.save(order);
+    // // mark order completed
+    // order.status = OrderStatus.COMPLETED;
+    // await this.orderRepo.save(order);
 
-    return { order, tx };
+    // return { order, tx };
   }
 }

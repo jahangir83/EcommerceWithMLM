@@ -1,4 +1,4 @@
-import { Controller, Get, Res } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, Res } from '@nestjs/common';
 import { Response } from 'express';
 
 @Controller()
@@ -33,5 +33,11 @@ export class AppController {
         </body>
       </html>
     `);
+  }
+
+  @Get('health')
+  @HttpCode(200)
+  healthCheck(){
+    return "ok"
   }
 }

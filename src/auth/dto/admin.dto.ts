@@ -5,7 +5,7 @@ import { UserRole } from "~/common/enums/role.enum";
 
 export class CreateAdminDto{
     @IsString()
-      name: string;
+      username: string;
     
       @IsEmail()
       email: string;

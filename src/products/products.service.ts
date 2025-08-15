@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { type Repository, Not } from "typeorm"
+import { Repository, Not } from "typeorm"
 import { Product, ProductStatus } from "~/entity"
 import type { CreateProductDto, UpdateProductDto, ProductFilterDto } from "./dto/product.dto"
 
@@ -16,7 +16,8 @@ export class ProductsService {
     return this.productRepo.save(product)
   }
 
-  async findAll(filterDto: ProductFilterDto = {}) {
+  // TODO: We should avoid any 
+  async findAll(filterDto:any /*ProductFilterDto = {}*/) {
     const {
       page = 1,
       limit = 20,

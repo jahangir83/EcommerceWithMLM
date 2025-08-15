@@ -109,36 +109,21 @@ if [ ! -f ".env" ]; then
     fi
 fi
 
-# Check if frontend .env.local exists
-if [ ! -f "frontend/.env.local" ]; then
-    print_warning "frontend/.env.local file not found. Creating from .env.example..."
-    if [ -f "frontend/.env.example" ]; then
-        cp frontend/.env.example frontend/.env.local
-        print_success "frontend/.env.local file created."
-    else
-        print_status "Creating basic frontend/.env.local file..."
-        cat > frontend/.env.local << EOF
+# Check if .env.local exists (for Next.js frontend)
+if [ ! -f ".env.local" ]; then
+    print_warning ".env.local file not found. Creating basic .env.local file..."
+    cat > .env.local << EOF
 NEXT_PUBLIC_API_URL=http://localhost:3001
 NEXT_PUBLIC_APP_NAME=AIT Platform
 EOF
-        print_success "Basic frontend/.env.local file created."
-    fi
+    print_success ".env.local file created."
 fi
 
-# Install backend dependencies if node_modules doesn't exist
+# Install dependencies if node_modules doesn't exist
 if [ ! -d "node_modules" ]; then
-    print_status "Installing backend dependencies..."
+    print_status "Installing dependencies..."
     pnpm install
-    print_success "Backend dependencies installed."
-fi
-
-# Install frontend dependencies if node_modules doesn't exist
-if [ ! -d "frontend/node_modules" ]; then
-    print_status "Installing frontend dependencies..."
-    cd frontend
-    pnpm install
-    cd ..
-    print_success "Frontend dependencies installed."
+    print_success "Dependencies installed."
 fi
 
 # Check database connection and run migrations if needed
@@ -149,14 +134,6 @@ else
     print_warning "Database connection failed. Please check your DATABASE_URL in .env file."
     print_status "Example: DATABASE_URL=postgresql://postgres:password@localhost:5432/ait_platform"
 fi
-
-# Run migrations
-print_status "Running database migrations..."
-pnpm run migration:run || print_warning "Migration failed. Database might already be up to date."
-
-# Seed database if needed
-print_status "Seeding database with initial data..."
-pnpm run seed || print_warning "Seeding failed. Database might already be seeded."
 
 # Function to start backend server
 start_backend() {
@@ -178,27 +155,7 @@ start_backend() {
     fi
 }
 
-# Function to start frontend server
-start_frontend() {
-    print_status "Starting frontend server on port 3000..."
-    cd frontend
-    pnpm run dev &
-    FRONTEND_PID=$!
-    echo $FRONTEND_PID > ../.frontend.pid
-    cd ..
-    
-    # Wait for frontend to start
-    sleep 5
-    
-    # Check if frontend is running
-    if curl -s http://localhost:3000 > /dev/null; then
-        print_success "Frontend server started successfully!"
-        print_status "Frontend Application: http://localhost:3000"
-    else
-        print_error "Frontend server failed to start properly."
-        return 1
-    fi
-}
+
 
 # Function to cleanup on exit
 cleanup() {
@@ -211,12 +168,7 @@ cleanup() {
         print_status "Backend server stopped."
     fi
     
-    if [ -f ".frontend.pid" ]; then
-        FRONTEND_PID=$(cat .frontend.pid)
-        kill $FRONTEND_PID 2>/dev/null || true
-        rm .frontend.pid
-        print_status "Frontend server stopped."
-    fi
+    
     
     print_success "All servers stopped. Goodbye!"
 }
@@ -237,12 +189,6 @@ fi
 
 echo ""
 
-# Start frontend server
-start_frontend
-if [ $? -ne 0 ]; then
-    print_error "Failed to start frontend server. Exiting..."
-    exit 1
-fi
 
 echo ""
 print_success "🎉 All servers are running successfully!"

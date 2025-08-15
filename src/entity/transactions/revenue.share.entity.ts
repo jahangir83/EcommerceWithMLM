@@ -8,7 +8,8 @@ import {
 } from 'typeorm';
 import { Transaction } from './transaction.entity';
 import { User } from '../users/user.entity';
-import { OrderItem } from '../product-services';
+import { OrderItem } from '~/orders/entities/order-item.entity';
+
 
 @Entity('revenue_shares')
 export class RevenueShare {

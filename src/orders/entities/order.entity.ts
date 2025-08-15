@@ -1,62 +1,102 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+  JoinColumn,
+} from "typeorm"
 
-import { OrderItem } from './order-item.entity';
-import { User } from '~/entity';
+import { OrderItem } from "./order-item.entity"
+import { User } from "~/entity"
 
 export enum OrderStatus {
-  PENDING_PAYMENT = 'pending_payment',
-  PAID = 'paid',
-  PROCESSING = 'processing',
-  SHIPPED = 'shipped',
-  DELIVERED = 'delivered',
-  COMPLETED = 'completed',
-  CANCELLED = 'cancelled',
+  PENDING_PAYMENT = "pending_payment",
+  PAID = "paid",
+  PROCESSING = "processing",
+  SHIPPED = "shipped",
+  DELIVERED = "delivered",
+  COMPLETED = "completed",
+  CANCELLED = "cancelled",
+  REFUNDED = "refunded",
 }
 
 export enum PaymentMethod {
-  COD = 'cod',
-  CARD = 'card',
-  MOBILE_BANKING = 'mobile_banking',
-  BKASH = 'bkash',
-  NAGAD = 'nagad',
-  STRIPE = 'stripe',
+  COD = "cod",
+  CARD = "card",
+  MOBILE_BANKING = "mobile_banking",
+  BKASH = "bkash",
+  NAGAD = "nagad",
+  ROCKET = "rocket",
+  WALLET = "wallet",
 }
 
-@Entity()
+@Entity("orders")
 export class Order {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn("uuid")
+  id: string
 
-  @ManyToOne(() => User, (user) => user.orders, { nullable: false })
-  user: User;
+  @Column({ unique: true })
+  orderNumber: string
 
-  @OneToMany(() => OrderItem, (item) => item.order, { cascade: true })
-  items: OrderItem[];
+  @ManyToOne(
+    () => User,
+    (user) => user.orders,
+  )
+  @JoinColumn({ name: "userId" })
+  user: User
 
-  @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.PENDING_PAYMENT })
-  status: OrderStatus;
+  @OneToMany(
+    () => OrderItem,
+    (item) => item.order,
+    { cascade: true },
+  )
+  items: OrderItem[]
 
-  @Column({ default: 0 })
-  subtotalAmount: number;
+  @Column({ type: "enum", enum: OrderStatus, default: OrderStatus.PENDING_PAYMENT })
+  status: OrderStatus
 
-  @Column({ default: 0 })
-  shippingAmount: number;
+  @Column("decimal", { precision: 10, scale: 2, default: 0 })
+  subtotalAmount: number
 
-  @Column({ default: 0 })
-  discountAmount: number;
+  @Column("decimal", { precision: 10, scale: 2, default: 0 })
+  shippingAmount: number
 
-  @Column({ default: 0 })
-  totalAmount: number;
+  @Column("decimal", { precision: 10, scale: 2, default: 0 })
+  taxAmount: number
 
-  @Column({ type: 'enum', enum: PaymentMethod, nullable: true })
-  paymentMethod: PaymentMethod | null;
+  @Column("decimal", { precision: 10, scale: 2, default: 0 })
+  discountAmount: number
+
+  @Column("decimal", { precision: 10, scale: 2, default: 0 })
+  totalAmount: number
+
+  @Column({ type: "enum", enum: PaymentMethod, nullable: true })
+  paymentMethod: PaymentMethod
+
+  @Column({ type: "jsonb", nullable: true })
+  shippingAddress: any
+
+  @Column({ type: "jsonb", nullable: true })
+  billingAddress: any
+
+  @Column({ type: "text", nullable: true })
+  notes: string
 
   @Column({ nullable: true })
-  shippingAddress: string;
+  trackingNumber: string
+
+  @Column({ nullable: true })
+  couponCode: string
+
+  @Column({ type: "jsonb", nullable: true })
+  metadata: any
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt: Date
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt: Date
 }

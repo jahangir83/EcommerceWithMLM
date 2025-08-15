@@ -1,6 +1,7 @@
 import { IsArray, IsEnum, IsNumber, IsObject, IsOptional, IsString, IsUUID, Min, ValidateNested } from "class-validator"
 import { Type } from "class-transformer"
-import { OrderStatus, PaymentMethod } from "~/entity"
+import { OrderStatus, PaymentMethod } from "../entities/order.entity"
+
 
 export class OrderItemDto {
   @IsUUID()

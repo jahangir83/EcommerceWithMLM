@@ -7,7 +7,7 @@ import { Repository } from 'typeorm';
 import { Uddokta  } from '~/entity';
 
 @Controller('uddokta')
-export class CourseController {
+export class UddoktaController {
   private service: ServicesCrudService<Uddokta>;
 
   constructor(

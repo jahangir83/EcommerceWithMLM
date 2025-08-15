@@ -1,30 +1,39 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { Order } from './order.entity';
-import { ProductType } from '../../products/product-type.enum';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from "typeorm"
+import { Order } from "./order.entity"
+import { Product } from "~/entity"
 
-@Entity()
+
+@Entity("order_items")
 export class OrderItem {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn("uuid")
+  id: string
 
-  @ManyToOne(() => Order, (order) => order.items)
-  order: Order;
+  @ManyToOne(
+    () => Order,
+    (order) => order.items,
+  )
+  @JoinColumn({ name: "orderId" })
+  order: Order
 
-  @Column()
-  productId: string;
-
-  @Column({ type: 'enum', enum: ProductType })
-  productType: ProductType;
-
-  @Column()
-  name: string;
-
-  @Column()
-  quantity: number;
-
-  @Column()
-  unitPrice: number;
+  @ManyToOne(
+    () => Product,
+    (product) => product.orderItems,
+  )
+  @JoinColumn({ name: "productId" })
+  product: Product
 
   @Column()
-  lineTotal: number;
+  productName: string
+
+  @Column()
+  quantity: number
+
+  @Column("decimal", { precision: 10, scale: 2 })
+  unitPrice: number
+
+  @Column("decimal", { precision: 10, scale: 2 })
+  totalPrice: number
+
+  @Column({ type: "jsonb", nullable: true })
+  productSnapshot: any
 }

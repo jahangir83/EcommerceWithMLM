@@ -10,7 +10,8 @@ import {
 } from "typeorm"
 import { Category } from "./category.entity"
 import { User } from "../users"
-import { OrderItem } from "../product-services"
+import { OrderItem } from "~/orders/entities/order-item.entity"
+
 
 export enum ProductType {
   PHYSICAL = "physical",

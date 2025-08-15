@@ -1,17 +1,24 @@
 import { Injectable } from "@nestjs/common"
 import type { Repository } from "typeorm"
-import { type User, type Product, type Order, type Transaction, type RevenueShare, OrderStatus } from "~/entity"
+import { Product, RevenueShare, Transaction, User } from "~/entity"
 import { UserRole } from "~/common/enums/role.enum"
+import { Order, OrderStatus } from "~/orders/entities/order.entity"
+import { InjectRepository } from "@nestjs/typeorm"
 
 @Injectable()
 export class AdminService {
   constructor(
+    @InjectRepository(User)
     private userRepo: Repository<User>,
+    @InjectRepository(Product)
     private productRepo: Repository<Product>,
+    @InjectRepository(Order)
     private orderRepo: Repository<Order>,
+    @InjectRepository(Transaction)
     private transactionRepo: Repository<Transaction>,
+    @InjectRepository(RevenueShare)
     private revenueShareRepo: Repository<RevenueShare>,
-  ) {}
+  ) { }
 
   async getDashboardStats() {
     const [
@@ -63,7 +70,7 @@ export class AdminService {
       this.userRepo.find({
         order: { createdAt: "DESC" },
         take: limit,
-        select: ["id", "name", "email", "createdAt", "role"],
+        select: ["id", "username", "email", "createdAt", "role"],
       }),
       this.orderRepo.find({
         relations: ["user"],
@@ -75,7 +82,7 @@ export class AdminService {
           totalAmount: true,
           status: true,
           createdAt: true,
-          user: { id: true, name: true },
+          user: { id: true, username: true },
         },
       }),
       this.productRepo.find({
@@ -87,7 +94,7 @@ export class AdminService {
           name: true,
           price: true,
           createdAt: true,
-          vendor: { id: true, name: true },
+          vendor: { id: true, username: true },
           category: { id: true, name: true },
         },
       }),

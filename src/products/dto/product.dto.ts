@@ -74,3 +74,6 @@ export class CreateProductDto {
 }
 
 export class UpdateProductDto extends PartialType(CreateProductDto) {}
+
+
+export class ProductFilterDto extends PartialType(CreateProductDto){}

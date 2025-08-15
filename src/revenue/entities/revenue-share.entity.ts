@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn } from 'typeorm';
 import { OrderItem } from '../../orders/entities/order-item.entity';
-import { User } from '../../users/user.entity';
+import { User } from '~/entity';
+
 
 @Entity()
 export class RevenueShare {

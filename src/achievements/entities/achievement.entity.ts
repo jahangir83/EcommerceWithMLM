@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn } from 'typeorm';
-import { User } from '../../users/user.entity';
+import { User } from '~/entity';
+
 
 @Entity()
 export class Achievement {

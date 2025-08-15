@@ -1,22 +1,20 @@
 import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common"
-import type { Repository } from "typeorm"
-import { type Payment, type Order, OrderStatus } from "~/entity"
-import type { CreatePaymentDto, PaymentFilterDto } from "./dto/payment.dto"
-import type { OrdersService } from "~/orders/orders.service"
+import  { Repository } from "typeorm"
 
-export enum PaymentStatus {
-  PENDING = "pending",
-  PROCESSING = "processing",
-  SUCCESS = "success",
-  FAILED = "failed",
-  CANCELLED = "cancelled",
-  REFUNDED = "refunded",
-}
+import type { CreatePaymentDto, PaymentFilterDto } from "./dto/payment.dto"
+import  { OrdersService } from "~/orders/orders.service"
+import { Payment, PaymentStatus } from "./entities/payment.entity"
+import { Order, OrderStatus } from "~/orders/entities/order.entity"
+import { InjectRepository } from "@nestjs/typeorm"
+
+
 
 @Injectable()
 export class PaymentsService {
   constructor(
+      @InjectRepository(Payment)
     private paymentRepo: Repository<Payment>,
+      @InjectRepository(Order)
     private orderRepo: Repository<Order>,
     private ordersService: OrdersService,
   ) {}
@@ -247,3 +245,5 @@ export class PaymentsService {
     }
   }
 }
+export { PaymentStatus }
+

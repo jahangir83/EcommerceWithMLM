@@ -4,8 +4,11 @@ import { PassportModule } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from '~/entity/users/user.entity';
+import { User } from '../entity';
+import { RefreshJwtStrategy } from './strategies/refresh-jwt.strategy';
 import { AuthController } from './auth.controller';
+
+
 
 @Module({
   imports: [
@@ -17,9 +20,8 @@ import { AuthController } from './auth.controller';
     TypeOrmModule.forFeature([User]),
     // UserModule,
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, RefreshJwtStrategy],
   controllers: [AuthController],
-  // ✅ Export these to make JwtAuthGuard work in other modules
   exports: [JwtStrategy, PassportModule, JwtModule],
 })
 export class AuthModule {}
