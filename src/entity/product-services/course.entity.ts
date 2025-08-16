@@ -24,6 +24,7 @@ export class Course implements ServiceInterface {
 
   @Column()
   type: string;
+  
   @Column({
     type: 'enum',
     enum: UserStatus,

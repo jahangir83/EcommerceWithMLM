@@ -33,13 +33,13 @@ export class Subscription implements ServiceInterface {
   serviceStatus: UserStatus;
 
   @Column({ nullable: true })
-  description?: string;
-
-  @Column({ nullable: true })
   image?: string;
 
   @Column({ default: true })
   isActive: boolean;
+
+  @Column({ nullable: true })
+  description?: string;
 
   @OneToMany(() => User, (user: User) => user.subscription, {
     cascade: true,

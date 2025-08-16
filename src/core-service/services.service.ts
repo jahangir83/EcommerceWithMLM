@@ -3,7 +3,7 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class ServicesCrudService<T extends object> {
-  constructor(private readonly repo: Repository<T>) {}
+  constructor(private readonly repo: Repository<T>) { }
 
   create(data: any): Promise<T> {
     const entity = this.repo.create(data);
@@ -15,7 +15,7 @@ export class ServicesCrudService<T extends object> {
     return this.repo.save(entity) as Promise<T>;
   }
 
-  findAll(): Promise<T[]> {
+  findAll():Promise<T[]> {
     return this.repo.find();
   }
 
