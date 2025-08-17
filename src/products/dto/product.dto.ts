@@ -1,5 +1,6 @@
 import { IsString, IsNumber, IsOptional, IsArray, Min } from "class-validator"
 import { ApiProperty, ApiPropertyOptional, PartialType } from "@nestjs/swagger"
+import { Category } from "~/entity"
 
 export class CreateProductDto {
   @ApiProperty({
@@ -38,8 +39,11 @@ export class CreateProductDto {
     description: "Category ID",
     example: 1,
   })
-  @IsNumber()
-  categoryId: number
+  @IsString()
+  categoryId: string
+
+  @IsOptional()
+  category: Category
 
   @ApiPropertyOptional({
     description: "Product images URLs",
@@ -73,7 +77,55 @@ export class CreateProductDto {
   tags?: string[]
 }
 
-export class UpdateProductDto extends PartialType(CreateProductDto) {}
+export class UpdateProductDto extends PartialType(CreateProductDto) { }
 
 
-export class ProductFilterDto extends PartialType(CreateProductDto){}
+export class ProductFilterDto {
+  @ApiPropertyOptional({ example: 1, description: 'Page number' })
+  @IsOptional()
+  page?: number;
+
+  @ApiPropertyOptional({ example: 10, description: 'Number of products per page' })
+  @IsOptional()
+  limit?: number;
+
+  @ApiPropertyOptional({ example: 'iphone', description: 'Search keyword' })
+  @IsOptional()
+  search?: string;
+
+  @ApiPropertyOptional({ example: 'uuid-of-category', description: 'Category ID filter' })
+  @IsOptional()
+  categoryId?: string;
+
+  @ApiPropertyOptional({ example: 500, description: 'Minimum price filter' })
+  @IsOptional()
+  minPrice?: number;
+
+  @ApiPropertyOptional({ example: 2000, description: 'Maximum price filter' })
+  @IsOptional()
+  maxPrice?: number;
+
+  @ApiPropertyOptional({ example: 'physical', description: 'Product type (physical/digital)' })
+  @IsOptional()
+  type?: string;
+
+  @ApiPropertyOptional({ example: 'ACTIVE', description: 'Product status' })
+  @IsOptional()
+  status?: string;
+
+  @ApiPropertyOptional({ example: true, description: 'Featured filter' })
+  @IsOptional()
+  isFeatured?: boolean;
+
+  @ApiPropertyOptional({ example: 'uuid-of-vendor', description: 'Filter by vendor' })
+  @IsOptional()
+  vendorId?: string;
+
+  @ApiPropertyOptional({ example: 'price', description: 'Sort by field' })
+  @IsOptional()
+  sortBy?: string;
+
+  @ApiPropertyOptional({ example: 'ASC', description: 'Sort order (ASC or DESC)' })
+  @IsOptional()
+  sortOrder?: 'ASC' | 'DESC';
+}

@@ -8,7 +8,7 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start -r tsconfig-paths/register",
+    "start": "nest start",
     "start:dev": "nest start --watch -r tsconfig-paths/register",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
@@ -19,7 +19,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "system:seed-dev": "ts-node -r tsconfig-paths/register ./src/database/seeds/seed-system-accounts.ts",
-    "system:seed-prod": "node dist/database/seed/seed-system-accounts.js "
+    "system:seed-prod": "node ./dist/database/seed/seed-system-accounts.js "
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

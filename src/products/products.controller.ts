@@ -1,174 +1,97 @@
-import { Controller, Get, Post, Patch, Param, Delete, Query, UseGuards } from "@nestjs/common"
-import { ProductsService } from "./products.service"
-import  { CreateProductDto } from "./dto/product.dto"
-import  { UpdateProductDto } from "./dto/product.dto"
-import { JwtAuthGuard } from "../common/guards/jwt-auth.guard"
-import { RolesGuard } from "../common/guards/roles.guard"
-import { Roles } from "../common/decorators/roles.decorator"
-import { UserRole } from "../common/enums/role.enum"
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery, ApiParam } from "@nestjs/swagger"
+import {
+  Controller, Get, Post, Param, Delete, Query, UseGuards, Body,
+  Put
+} from "@nestjs/common";
+import { ProductsService } from "./products.service";
+import { CreateProductDto, ProductFilterDto, UpdateProductDto } from "./dto/product.dto";
+import { JwtAuthGuard } from "~/common/guards/jwt-auth.guard";
+import { RolesGuard } from "~/common/guards/roles.guard";
+import { Roles } from "~/common/decorators/roles.decorator";
+import { UserRole } from "~/common/enums/role.enum";
+import {
+  ApiTags, ApiOperation, ApiResponse, ApiQuery,
+} from "@nestjs/swagger";
+import { Product } from "~/entity";
 
-@ApiTags("Products")
-@Controller("products")
+
+
+@ApiTags('Products')
+@Controller('products')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(private readonly productsService: ProductsService) { }
 
+  // 📌 Create
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.VENDOR, UserRole.ADMIN)
-  @ApiBearerAuth("JWT-auth")
-  @ApiOperation({ summary: "Create a new product" })
-  @ApiResponse({
-    status: 201,
-    description: "Product created successfully",
-    schema: {
-      example: {
-        id: 1,
-        name: "Sample Product",
-        description: "Product description",
-        price: 99.99,
-        stock: 100,
-        category: "Electronics",
-        vendor: {
-          id: 1,
-          name: "Vendor Name",
-        },
-      },
-    },
-  })
-  @ApiResponse({ status: 401, description: "Unauthorized" })
-  @ApiResponse({ status: 403, description: "Forbidden - insufficient permissions" })
-  create(createProductDto: CreateProductDto) {
-    return this.productsService.create(createProductDto)
+  @Roles(UserRole.ADMIN, UserRole.VENDOR)
+  @ApiOperation({ summary: 'Create a new product' })
+  @ApiResponse({ status: 201, description: 'Product created successfully', type: Product })
+  async create(@Body() dto: CreateProductDto): Promise<Product> {
+    return this.productsService.createProduct(dto);
   }
 
+  // 📌 Find All with filters
   @Get()
-  @ApiOperation({ summary: "Get all products with pagination and filters" })
-  @ApiQuery({ name: "page", required: false, description: "Page number", example: 1 })
-  @ApiQuery({ name: "limit", required: false, description: "Items per page", example: 10 })
-  @ApiQuery({ name: "category", required: false, description: "Filter by category" })
-  @ApiQuery({ name: "search", required: false, description: "Search in product name and description" })
-  @ApiQuery({ name: "minPrice", required: false, description: "Minimum price filter" })
-  @ApiQuery({ name: "maxPrice", required: false, description: "Maximum price filter" })
-  @ApiResponse({
-    status: 200,
-    description: "Products retrieved successfully",
-    schema: {
-      example: {
-        data: [
-          {
-            id: 1,
-            name: "Sample Product",
-            description: "Product description",
-            price: 99.99,
-            stock: 100,
-            images: ["image1.jpg", "image2.jpg"],
-            category: {
-              id: 1,
-              name: "Electronics",
-            },
-            vendor: {
-              id: 1,
-              name: "Vendor Name",
-            },
-          },
-        ],
-        total: 100,
-        page: 1,
-        limit: 10,
-        totalPages: 10,
-      },
-    },
-  })
-  findAll(
-    @Query('page') page?: number,
-    @Query('limit') limit?: number,
-    @Query('category') category?: string,
-    @Query('search') search?: string,
-    @Query('minPrice') minPrice?: number,
-    @Query('maxPrice') maxPrice?: number,
-  ) {
-    return this.productsService.findAll({
-      page: page || 1,
-      limit: limit || 10,
-      category,
-      search,
-      minPrice,
-      maxPrice,
-    })
+  @ApiOperation({ summary: 'Get all products with filters' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiQuery({ name: 'categoryId', required: false, type: String })
+  @ApiQuery({ name: 'minPrice', required: false, type: Number })
+  @ApiQuery({ name: 'maxPrice', required: false, type: Number })
+  @ApiQuery({ name: 'type', required: false, type: String })
+  @ApiQuery({ name: 'status', required: false, type: String })
+  @ApiQuery({ name: 'isFeatured', required: false, type: Boolean })
+  @ApiQuery({ name: 'vendorId', required: false, type: String })
+  @ApiQuery({ name: 'sortBy', required: false, type: String })
+  @ApiQuery({ name: 'sortOrder', required: false, enum: ['ASC', 'DESC'] })
+  @ApiResponse({ status: 200, description: 'Return list of products' })
+  async findAll(@Query() query: ProductFilterDto) {
+    return this.productsService.findAll(query);
   }
 
+  // 📌 Find One
   @Get(':id')
-  @ApiOperation({ summary: 'Get product by ID' })
-  @ApiParam({ name: 'id', description: 'Product ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'Product found',
-    schema: {
-      example: {
-        id: 1,
-        name: 'Sample Product',
-        description: 'Detailed product description',
-        price: 99.99,
-        stock: 100,
-        images: ['image1.jpg', 'image2.jpg'],
-        specifications: {
-          weight: '1kg',
-          dimensions: '10x10x10cm'
-        },
-        category: {
-          id: 1,
-          name: 'Electronics'
-        },
-        vendor: {
-          id: 1,
-          name: 'Vendor Name',
-          rating: 4.5
-        },
-        reviews: [
-          {
-            id: 1,
-            rating: 5,
-            comment: 'Great product!',
-            user: 'John Doe'
-          }
-        ]
-      }
-    }
-  })
+  @ApiOperation({ summary: 'Get a single product by ID' })
+  @ApiResponse({ status: 200, description: 'Return product', type: Product })
   @ApiResponse({ status: 404, description: 'Product not found' })
-  findOne(@Param('id') id: string) {
-    //TODO: We should fix type
-    return this.productsService.findOne(+id as any);
+  async findOne(@Param('id') id: string) {
+    return this.productsService.getProductById(id);
   }
 
-  @Patch(":id")
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.VENDOR, UserRole.ADMIN)
-  @ApiBearerAuth("JWT-auth")
-  @ApiOperation({ summary: "Update product" })
-  @ApiParam({ name: "id", description: "Product ID" })
-  @ApiResponse({ status: 200, description: "Product updated successfully" })
-  @ApiResponse({ status: 401, description: "Unauthorized" })
-  @ApiResponse({ status: 403, description: "Forbidden" })
-  @ApiResponse({ status: 404, description: "Product not found" })
-  update(@Param('id') id: string, updateProductDto: UpdateProductDto) {
-    //TODO: We should fix type
-    return this.productsService.update(+id as any, updateProductDto)
+  // 📌 Update
+  @Put(':id')
+  @Roles(UserRole.ADMIN, UserRole.VENDOR)
+  @ApiOperation({ summary: 'Update a product' })
+  @ApiResponse({ status: 200, description: 'Product updated', type: Product })
+  @ApiResponse({ status: 404, description: 'Product not found' })
+  async update(@Param('id') id: string, @Body() dto: UpdateProductDto) {
+    return this.productsService.update(id, dto);
   }
 
+  // 📌 Delete (soft delete)
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.VENDOR, UserRole.ADMIN)
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Delete product' })
-  @ApiParam({ name: 'id', description: 'Product ID' })
-  @ApiResponse({ status: 200, description: 'Product deleted successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @Roles(UserRole.ADMIN, UserRole.VENDOR)
+  @ApiOperation({ summary: 'Delete a product (soft delete)' })
+  @ApiResponse({ status: 200, description: 'Product deleted' })
   @ApiResponse({ status: 404, description: 'Product not found' })
-  remove(@Param('id') id: string) {
-    //TODO: We should fix type
-    return this.productsService.remove(+id as any);
+  async remove(@Param('id') id: string) {
+    return this.productsService.remove(id);
+  }
+
+  // 📌 Featured Products
+  @Get('featured/list')
+  @ApiOperation({ summary: 'Get featured products' })
+  async getFeatured() {
+    return this.productsService.getFeaturedProducts();
+  }
+
+  // 📌 Related Products
+  @Get(':id/related')
+  @ApiOperation({ summary: 'Get related products by category' })
+  @ApiResponse({ status: 200, description: 'Related products returned' })
+  @ApiResponse({ status: 404, description: 'Product not found' })
+  async getRelated(@Param('id') id: string) {
+    return this.productsService.getRelatedProducts(id);
   }
 }

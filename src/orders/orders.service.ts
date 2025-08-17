@@ -46,7 +46,7 @@ export class OrdersService {
 
       // Process order items
       for (const itemDto of createOrderDto.items) {
-        const product = await this.productsService.findOne(itemDto.productId)
+        const product = await this.productsService.getProductById(itemDto.productId)
 
         if (!product) {
           throw new NotFoundException(`Product ${itemDto.productId} not found`)
