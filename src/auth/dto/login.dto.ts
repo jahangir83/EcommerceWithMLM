@@ -9,7 +9,7 @@ export class LoginDto {
   })
   @IsOptional()
   @IsEmail()
-  email: string
+  email?: string
 
   @ApiProperty({
     type:'string',
@@ -17,7 +17,7 @@ export class LoginDto {
     required:true,
     example:"+8801631551301"
   })
-  @IsPhoneNumber()
+  @IsString()
   phone:string
 
   @ApiProperty({

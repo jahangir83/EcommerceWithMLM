@@ -78,7 +78,7 @@ export class AuthController {
 
     // Send only access token in response body
     return {
-      user,
+      user, refresh_token: tokens.refresh_token,
       access_token: tokens.access_token,
       token_type: tokens.token_type,
       expires_in: tokens.expires_in,
