@@ -36,6 +36,9 @@ import { AdminModule } from "./admin/admin.module"
 import { NotificationsModule } from "./notifications/notifications.module"
 import { ReportsModule } from "./reports/reports.module"
 import { CoreServiceModule } from "./core-service/core-service.module"
+import { ServicesModule } from "./services/services.module"
+import { FulfilmentModule } from "./fulfilment/fulfilment.module"
+import { Shipment } from "./fulfilment/entities/shipment.entity"
 
 @Module({
   imports: [
@@ -49,7 +52,7 @@ import { CoreServiceModule } from "./core-service/core-service.module"
       },
     ]),
 
-    TypeOrmModule.forRootAsync({
+     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
@@ -75,6 +78,7 @@ import { CoreServiceModule } from "./core-service/core-service.module"
           Product,
           Category,
           OrderItem,
+          Shipment, // Added Shipment entity for fulfillment tracking
         ],
       }),
     }),
@@ -92,7 +96,10 @@ import { CoreServiceModule } from "./core-service/core-service.module"
     AdminModule,
     NotificationsModule,
     ReportsModule,
+    FulfilmentModule, // Added FulfilmentModule for shipping and delivery
+    ServicesModule, // Added ServicesModule for digital delivery and orchestration
   ],
   controllers: [AppController],
+ 
 })
 export class AppModule {}

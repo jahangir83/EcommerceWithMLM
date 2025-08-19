@@ -7,7 +7,6 @@ import { Roles } from "~/common/decorators/roles.decorator"
 import { UserRole } from "~/common/enums/role.enum"
 import { type OrderStatus } from "./entities/order.entity"
 
-
 @Controller("orders")
 @UseGuards(JwtAuthGuard)
 export class OrdersController {

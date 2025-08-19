@@ -9,7 +9,7 @@ import { User } from './user.entity';
 import { ProfileInterface } from 'src/common/types/user.type';
 
 // User profile
-@Entity()
+@Entity('profiles')
 export class UserProfile implements ProfileInterface {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -17,15 +17,6 @@ export class UserProfile implements ProfileInterface {
   @OneToOne(() => User, (user) => user.profile, { onDelete: 'CASCADE' })
   @JoinColumn()
   user: User;
-
-  @Column({ nullable: true })
-  name?: string;
-
-  @Column({ nullable: true })
-  email?: string;
-
-  @Column({ nullable: false })
-  phone: string;
 
   @Column({ nullable: true })
   fatherName?: string;

@@ -1,101 +1,86 @@
-import { IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
-import { ProfileInterface, UserInterface } from 'src/common/types/user.type';
-import { CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { IsNotEmpty, IsObject, IsOptional, IsString, IsDateString } from 'class-validator';
+import { ProfileInterface } from 'src/common/types/user.type';
 
 /**
  * DTO for creating a user profile.
  * This class defines the structure of the data required to create a new user profile.
  */
 
-type CreateProfileDtoInterface = Omit<ProfileInterface, 'id' | 'userId'>;
+type CreateProfileDtoInterface = Omit<
+  ProfileInterface,
+  'id' | 'userId' | 'createdAt' | 'updatedAt'
+>;
 
 export class CreateProfileDto implements CreateProfileDtoInterface {
-  createdAt: Date;
-  updatedAt: Date;
-  user?: UserInterface | undefined;
-
-  @IsNotEmpty()
-  @IsString()
-  phone: string;
-
   @IsOptional()
-  @IsString()
-  name?: string;
-
-  @IsOptional()
-  @IsString()
-  email?: string;
-
-  @IsOptional()
-  @IsString()
+  @IsString({ message: 'Father name must be a valid string.' })
   fatherName?: string;
 
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'Mother name must be a valid string.' })
   motherName?: string;
 
   @IsOptional()
+  @IsDateString({}, { message: 'Birth date must be a valid date string (YYYY-MM-DD).' })
   birthDate?: Date;
 
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'Gender must be one of: male, female, other.' })
   gender?: 'male' | 'female' | 'other';
 
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'Religion must be a valid string.' })
   religion?: string;
 
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'Marital status must be one of: single, married, divorced.' })
   maritalStatus?: 'single' | 'married' | 'divorced';
 
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'National ID must be a valid string.' })
   nationalId?: string;
 
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'Geo location must be a valid string.' })
   geoLocation?: string;
 
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'Division must be a valid string.' })
   division?: string;
 
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'District must be a valid string.' })
   district?: string;
 
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'Upazila must be a valid string.' })
   upazila?: string;
 
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'Union must be a valid string.' })
   union?: string;
 
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'Village must be a valid string.' })
   village?: string;
 
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'Post office must be a valid string.' })
   postOffice?: string;
 
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'Road must be a valid string.' })
   road?: string;
 
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'House number must be a valid string.' })
   houseNo?: string;
 
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'Postal code must be a valid string.' })
   postalCode?: string;
 
   @IsOptional()
-  @IsObject()
+  @IsObject({ message: 'Extra info must be a valid JSON object.' })
   extraInfo?: JSON;
-
-
 }

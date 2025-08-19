@@ -5,6 +5,8 @@ import { BadRequestException, ValidationPipe } from "@nestjs/common"
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger"
 import * as dotenv from "dotenv"
 import cookieParser from 'cookie-parser';
+import { AllExceptionsFilter } from './common/exceptions/all-exceptions.filter';
+import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 
 dotenv.config()
 
@@ -73,6 +75,12 @@ async function bootstrap() {
       operationsSorter: "alpha",
     },
   })
+
+    // Global Filters
+  app.useGlobalFilters(new AllExceptionsFilter());
+
+  // Global Interceptors
+  app.useGlobalInterceptors(new TransformInterceptor());
 
   const port = process.env.PORT || 3001
   app.use(cookieParser())

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, HttpCode, HttpStatus, Req, Res } from "@nestjs/common"
+import { Controller, Post, Body, UseGuards, HttpCode, HttpStatus, Req, Res, UnauthorizedException, InternalServerErrorException } from "@nestjs/common"
 import { Response } from 'express'
 import { AuthService } from "./auth.service"
 import { LoginDto } from "./dto/login.dto"
@@ -7,6 +7,7 @@ import { LocalAuthGuard } from "../common/guards/local-auth.guard"
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard"
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody } from "@nestjs/swagger"
 import { JwtRefreshGuard } from "../common/guards/jwt-refresh.guard"
+import { UserInactiveException } from "~/common/exceptions/user-inactive.exception"
 
 @Controller("auth")
 @ApiTags("Authentication")
@@ -65,24 +66,39 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   @Post('login')
   async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
-    const user = await this.authService.validateUser(dto);
-    const tokens = await this.authService.issueTokens(user);
+    try {
+      const user = await this.authService.validateUser(dto);
+      const tokens = await this.authService.issueTokens({
+        id:user.id,
+        email: user.email,
+        phone:user.phone,
+        role:user.role
+      });
 
-    // Set refresh token in HttpOnly cookie
-    res.cookie('refresh_token', tokens.refresh_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // true in prod
-      sameSite: 'strict',
-      maxAge: this.authService.parseExpires(process.env.JWT_REFRESH_EXPIRES || '1d')  // 7 days
-    });
+      // Set refresh token in HttpOnly cookie
+      res.cookie('refresh_token', tokens.refresh_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production', // true in prod
+        sameSite: 'strict',
+        maxAge: this.authService.parseExpires(process.env.JWT_REFRESH_EXPIRES || '1d')  // 7 days
+      });
 
-    // Send only access token in response body
-    return {
-      user, refresh_token: tokens.refresh_token,
-      access_token: tokens.access_token,
-      token_type: tokens.token_type,
-      expires_in: tokens.expires_in,
-    };
+      // Send only access token in response body
+      return {
+        user, refresh_token: tokens.refresh_token,
+        access_token: tokens.access_token,
+        token_type: tokens.token_type,
+        expires_in: tokens.expires_in,
+      };
+    } catch (e) {
+      // If it's already a known exception, rethrow
+      if (e instanceof UnauthorizedException || e instanceof UserInactiveException) {
+        throw e;
+      }
+
+      // Otherwise, throw a generic error
+      throw new InternalServerErrorException("Authentication failed");
+    }
   }
 
 
@@ -106,8 +122,8 @@ export class AuthController {
   @Post('refresh')
   @UseGuards(JwtRefreshGuard)
   async refresh(@Req() req: any, @Res({ passthrough: true }) res: Response) {
-    const { sub, email, role } = req.user;
-    const tokens = await this.authService.issueTokens({ id: sub, email, role });
+    const { sub, email, role, phone } = req.user;
+    const tokens = await this.authService.issueTokens({ id: sub, email, role, phone });
 
     // rotate refresh token in cookie
     res.cookie('refresh_token', tokens.refresh_token, {

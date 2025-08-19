@@ -41,9 +41,6 @@ export interface UserInterface {
 
 export interface ProfileInterface {
   id: string;
-  name?: string;
-  email?: string;
-  phone: string;
   fatherName?: string;
   motherName?: string;
   birthDate?: Date;

@@ -65,7 +65,6 @@ export class User implements UserInterface {
   @Column({ default: false }) isReferralCodeUsed: boolean;
 
   @OneToOne(() => UserProfile, (profile) => profile.user, { cascade: true })
-  @JoinColumn()
   profile: UserProfile;
 
   // subscriptions ... keep your mappings

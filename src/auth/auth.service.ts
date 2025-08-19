@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -17,9 +18,6 @@ import { CreateAdminDto } from './dto/admin.dto';
 import { LeaderShipDisignation } from '../entity/users/leadership-digisnation.entity';
 import { UserInactiveException } from '~/common/exceptions/user-inactive.exception';
 
-
-
-type UserShape = { id: number | string; email: string; password?: string; role?: string };
 
 
 
@@ -114,38 +112,51 @@ export class AuthService {
   }
 
 
-  async validateUser(dto: LoginDto): Promise<UserShape> {
+  async validateUser(dto: LoginDto): Promise<Pick<User, "id" | "phone" | "email" | "role" | "referralCode">> {
+
     const user = await this.userRepo.findOne({
       where: [
         { phone: dto.phone },
         { email: dto.email }
-      ]
+      ],
+      select: {
+        id: true,
+        phone: true,
+        email: true,
+        role: true,
+        referralCode: true,
+        password: true,
+        isActive: true
+      }
     });
 
     if (!user || !(await bcrypt.compare(dto.password, user.password))) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException("Invalid credentials");
     }
 
     if (!user.isActive) {
-      throw new UserInactiveException()
+      throw new UserInactiveException();
     }
 
-    const payload: UserShape = {
+    const payload: Pick<User, "id" | "phone" | "email" | "role" | "referralCode"> = {
       id: user.id,
+      phone: user.phone,
       email: user.email,
       role: user.role,
+      referralCode: user.referralCode,
     };
 
-    return payload
+    return payload;
+
   }
 
 
-  async issueTokens(user: Pick<UserShape, 'id' | 'email' | 'role'>) {
-    const payload = { sub: user.id, email: user.email, role: user.role };
+  async issueTokens(user: Pick<User, "id" | "phone" | "email" | "role">) {
+    const payload = { sub: user.id, email: user.email, role: user.role, phone: user.phone };
 
     const access_token = await this.jwtService.signAsync(payload, {
       secret: process.env.JWT_ACCESS_SECRET || 'access_secret_dev',
-      expiresIn: process.env.JWT_ACCESS_EXPIRES || '15m',
+      expiresIn: process.env.JWT_ACCESS_EXPIRES || '15d',
     });
 
     const refresh_token = await this.jwtService.signAsync(payload, {
