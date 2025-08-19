@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, HttpCode, HttpStatus, Req, Res, UnauthorizedException, InternalServerErrorException } from "@nestjs/common"
+import { Controller, Post, Body, UseGuards, HttpCode, HttpStatus, Req, Res, UnauthorizedException, InternalServerErrorException, BadRequestException, Get } from "@nestjs/common"
 import { Response } from 'express'
 import { AuthService } from "./auth.service"
 import { LoginDto } from "./dto/login.dto"
@@ -8,6 +8,7 @@ import { JwtAuthGuard } from "../common/guards/jwt-auth.guard"
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody } from "@nestjs/swagger"
 import { JwtRefreshGuard } from "../common/guards/jwt-refresh.guard"
 import { UserInactiveException } from "~/common/exceptions/user-inactive.exception"
+import { runSeed } from "~/database/seeds/seed-system-accounts"
 
 @Controller("auth")
 @ApiTags("Authentication")
@@ -69,10 +70,10 @@ export class AuthController {
     try {
       const user = await this.authService.validateUser(dto);
       const tokens = await this.authService.issueTokens({
-        id:user.id,
+        id: user.id,
         email: user.email,
-        phone:user.phone,
-        role:user.role
+        phone: user.phone,
+        role: user.role
       });
 
       // Set refresh token in HttpOnly cookie
@@ -140,4 +141,12 @@ export class AuthController {
     };
   }
 
+  @Get('seed')
+  async runSystemSeed() {
+    try {
+      await runSeed()
+    } catch (error) {
+      throw new BadRequestException(`System seed failed`)
+    }
+  }
 }
