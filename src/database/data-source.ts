@@ -8,7 +8,7 @@ import { RevenueShare } from '~/revenue/entities/revenue-share.entity';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
-  url: `postgresql://aitdb123_8p1h_user:s6IwTC45wMaSu1QqqMVBDKBF8pKLm0hy@dpg-d2gvt22dbo4c73ajd40g-a/aitdb123_8p1h`,//process.env.DATABASE_URL, //?? 'postgres://nest:nestjs@localhost:5432/nest',
+  url: process.env.DATABASE_URL ?? 'postgres://nest:nestjs@localhost:5432/nest',
   entities: [
     User,
     UserProfile,

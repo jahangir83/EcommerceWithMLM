@@ -24,7 +24,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         let message: any =
             exception instanceof HttpException
                 ? exception.getResponse()
-                : 'Internal server error';
+                : 'Internal server error'; 
 
         // 👇 Preserve ValidationPipe’s custom error format
         if (exception instanceof BadRequestException) {

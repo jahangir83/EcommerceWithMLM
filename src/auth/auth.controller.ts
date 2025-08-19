@@ -2,7 +2,7 @@ import { Controller, Post, Body, UseGuards, HttpCode, HttpStatus, Req, Res, Unau
 import { Response } from 'express'
 import { AuthService } from "./auth.service"
 import { LoginDto } from "./dto/login.dto"
-import type { RegisterDto } from "./dto/register.dto"
+import { RegisterDto } from "./dto/register.dto"
 import { LocalAuthGuard } from "../common/guards/local-auth.guard"
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard"
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody } from "@nestjs/swagger"
@@ -17,6 +17,7 @@ export class AuthController {
 
   @Post('register')
   @ApiOperation({ summary: 'Register a new user' })
+    @ApiBody({ type: RegisterDto })
   @ApiResponse({
     status: 201,
     description: 'User successfully registered',

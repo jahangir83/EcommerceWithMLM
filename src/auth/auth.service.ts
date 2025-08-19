@@ -50,14 +50,27 @@ export class AuthService {
 
   async register(dto: RegisterDto): Promise<User> {
     // --- STEP 1: Check for existing email or phone before attempting to create ---
-    const existingUserByEmail = await this.userRepo.findOne({
-      where: { email: dto.email },
+    // const existingUserByEmail = await this.userRepo.findOneBy({
+    //   email:dto.email
+    // });
+
+    // if (existingUserByEmail) {
+    //   throw new ConflictException('Email already registered');
+    // }
+
+
+    const existingUser = await this.userRepo.findOne({
+      where: [{ email: dto.email }, { phone: dto.phone }],
     });
 
-    if (existingUserByEmail) {
-      throw new ConflictException('Email already registered');
+    if (existingUser) {
+      if (existingUser.email === dto.email) {
+        throw new ConflictException('Email already registered');
+      }
+      if (existingUser.phone === dto.phone) {
+        throw new ConflictException('Phone number already registered');
+      }
     }
-
     const existingUserByPhone = await this.userRepo.findOne({
       where: { phone: dto.phone },
     });
@@ -134,9 +147,9 @@ export class AuthService {
       throw new UnauthorizedException("Invalid credentials");
     }
 
-    if (!user.isActive) {
-      throw new UserInactiveException();
-    }
+    // if (!user.isActive) {
+    //   throw new UserInactiveException();
+    // }
 
     const payload: Pick<User, "id" | "phone" | "email" | "role" | "referralCode"> = {
       id: user.id,
