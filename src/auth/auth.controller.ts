@@ -144,7 +144,7 @@ export class AuthController {
   @Get('seed')
   async runSystemSeed() {
     try {
-      await runSeed()
+      return runSeed()
     } catch (error) {
       throw new BadRequestException(`System seed failed`)
     }

@@ -58,8 +58,8 @@ import { Shipment } from "./fulfilment/entities/shipment.entity"
       useFactory: (configService: ConfigService) => ({
         type: "postgres",
         url: configService.get<string>("DATABASE_URL"),
-        synchronize: true,
-        // logging: configService.get<string>("NODE_ENV") === "development",
+        synchronize: configService.get<string>("NODE_ENV") === "development",
+        logging: configService.get<string>("NODE_ENV") === "development",
         entities: [
           User,
           UserProfile,
