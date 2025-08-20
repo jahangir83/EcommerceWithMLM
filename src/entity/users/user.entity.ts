@@ -20,36 +20,43 @@ import { UserInterface } from '~/common/types/user.type';
 import { Course, Subscription, Uddokta } from '../product-services';
 import { Payment } from '~/payments/entities/payment.entity';
 import { Order } from '~/orders/entities/order.entity';
+import { Verify } from './verify.entity';
 
 @Entity('users')
 export class User implements UserInterface {
-  @PrimaryGeneratedColumn('uuid') @Index() 
+  @PrimaryGeneratedColumn('uuid') @Index()
   id: string;
-  @Column() 
+  @Column()
   username: string;
-  @Column({ nullable: true, unique: true }) 
+  @Column({ nullable: true, unique: true })
   email: string;
-  @Column({ unique: true }) 
+  @Column({ unique: true })
   phone: string;
-  @Column() 
+  @Column()
   password: string;
   @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
   role: UserRole;
-  @Column({ nullable: true }) 
+  @Column({ nullable: true })
   avatar: string;
 
-  @Column({ unique: true, nullable: true }) 
+  @Column({ unique: true, nullable: true })
   referralCode: string;
 
-  @Column({ nullable: true, type: 'uuid' }) 
+  @Column({ nullable: true, type: 'uuid' })
   referredById: string;
 
-  @OneToMany(() => User, (u) => u.referredBy) 
+  @OneToMany(() => User, (u) => u.referredBy)
   referrals: User[];
 
   @ManyToOne(() => User, (u) => u.referrals)
   @JoinColumn({ name: 'referredById' })
   referredBy: User;
+
+  // 👇 This is the missing part
+  @OneToMany(() => Verify, (verify) => verify.user, {
+    cascade: true,
+  })
+  verifications: Verify[];
 
   @Column({ default: 0 }) generation: number;
   @Column({ default: 0 }) leadershipId: number;

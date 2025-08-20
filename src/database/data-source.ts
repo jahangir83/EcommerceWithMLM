@@ -1,5 +1,6 @@
 import { DataSource } from 'typeorm';
 import { AccountBalance, Category, Course, JournalEntry, LeaderShipDisignation, Subscription, Transaction, Uddokta, User, UserProfile, Wallet, Withdrawal, Product, } from '~/entity/index';
+import { Verify } from '~/entity/users/verify.entity';
 import { Shipment } from '~/fulfilment/entities/shipment.entity';
 import { OrderItem } from '~/orders/entities/order-item.entity';
 import { Order } from '~/orders/entities/order.entity';
@@ -29,6 +30,7 @@ export const AppDataSource = new DataSource({
     LeaderShipDisignation,
 
     Shipment, // Added Shipment entity for fulfillment tracking
+    Verify
   ],
   // migrations: ["src/database/migrations/*.ts"],
   synchronize: process.env.NODE_ENV === 'development',

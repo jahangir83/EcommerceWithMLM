@@ -39,6 +39,7 @@ import { CoreServiceModule } from "./core-service/core-service.module"
 import { ServicesModule } from "./services/services.module"
 import { FulfilmentModule } from "./fulfilment/fulfilment.module"
 import { Shipment } from "./fulfilment/entities/shipment.entity"
+import { Verify } from "./entity/users/verify.entity"
 
 @Module({
   imports: [
@@ -79,6 +80,7 @@ import { Shipment } from "./fulfilment/entities/shipment.entity"
           Category,
           OrderItem,
           Shipment, // Added Shipment entity for fulfillment tracking
+          Verify
         ],
       }),
     }),

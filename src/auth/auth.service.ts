@@ -2,7 +2,6 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -17,6 +16,7 @@ import { UserRole } from 'src/common/enums/role.enum';
 import { CreateAdminDto } from './dto/admin.dto';
 import { LeaderShipDisignation } from '../entity/users/leadership-digisnation.entity';
 import { UserInactiveException } from '~/common/exceptions/user-inactive.exception';
+import { VerifyService } from './verify.service';
 
 
 
@@ -31,6 +31,7 @@ export class AuthService {
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
     private readonly jwtService: JwtService,
+    private readonly verifyService: VerifyService,
   ) { }
 
 
@@ -92,9 +93,9 @@ export class AuthService {
         throw new UnauthorizedException('Invalid referral code');
       }
 
-      isActive = true; // User becomes active if referred
-    }
 
+    }
+    isActive = true; // User becomes active if referred
     const hashed = await bcrypt.hash(dto.password, 10);
 
     const user = this.userRepo.create({
@@ -125,6 +126,7 @@ export class AuthService {
   }
 
 
+
   async validateUser(dto: LoginDto): Promise<Pick<User, "id" | "phone" | "email" | "role" | "referralCode">> {
 
     const user = await this.userRepo.findOne({
@@ -147,9 +149,9 @@ export class AuthService {
       throw new UnauthorizedException("Invalid credentials");
     }
 
-    // if (!user.isActive) {
-    //   throw new UserInactiveException();
-    // }
+    if (!user.isActive) {
+      throw new UserInactiveException();
+    }
 
     const payload: Pick<User, "id" | "phone" | "email" | "role" | "referralCode"> = {
       id: user.id,

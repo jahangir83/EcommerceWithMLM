@@ -1,5 +1,6 @@
-import { IsEmail, IsString, MinLength, IsPhoneNumber, IsOptional, IsNotEmpty } from "class-validator"
+import { IsEmail, IsString, MinLength, IsPhoneNumber, IsOptional, IsNotEmpty, IsEnum } from "class-validator"
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger"
+import { VerifyType } from "~/entity/users/verify.entity"
 
 export class RegisterDto {
 
@@ -50,4 +51,15 @@ export class RegisterDto {
   referralCode?: string
 }
 
+export class PhoneNumberVerifyDto{
+  @IsPhoneNumber()
+  phone: string;
+
+  @IsOptional()
+  code?: string; // If provided, we confirm. If not, we send OTP.
+
+  @IsEnum(VerifyType)
+  @IsOptional()
+  type: VerifyType = VerifyType.PHONE;
+}
 
