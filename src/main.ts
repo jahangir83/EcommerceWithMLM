@@ -7,11 +7,13 @@ import * as dotenv from "dotenv"
 import cookieParser from 'cookie-parser';
 import { AllExceptionsFilter } from './common/exceptions/all-exceptions.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { join } from 'path';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 dotenv.config()
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule)
+  const app = await NestFactory.create<NestExpressApplication>(AppModule)
 
   //Cookie parser
 
@@ -84,6 +86,11 @@ async function bootstrap() {
 
   const port = process.env.PORT || 3001
   app.use(cookieParser())
+
+// 👇 Expose the "uploads" folder at http://localhost:3000/uploads/<file>
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+    prefix: '/uploads/',  // URL prefix
+  });
   await app.listen(port)
 
   console.log(`🚀 Backend server running on: http://localhost:${port}`)

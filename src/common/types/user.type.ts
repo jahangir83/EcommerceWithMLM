@@ -10,7 +10,6 @@ import {
 export interface UserInterface {
   id: string;
   username: string;
-  email?: string | null;
   phone: string;
   password: string;
   role: UserRole;
@@ -41,6 +40,8 @@ export interface UserInterface {
 
 export interface ProfileInterface {
   id: string;
+  fullName:string;
+  email:string;
   fatherName?: string;
   motherName?: string;
   birthDate?: Date;
@@ -61,6 +62,8 @@ export interface ProfileInterface {
   userId?: string;
   extraInfo?: JSON;
   user?: UserInterface; // optional and nullable
+  nidFront:string;
+  nidBack:string;
   createdAt: Date;
   updatedAt: Date;
 }

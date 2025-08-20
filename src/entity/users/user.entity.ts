@@ -28,8 +28,7 @@ export class User implements UserInterface {
   id: string;
   @Column()
   username: string;
-  @Column({ nullable: true, unique: true })
-  email: string;
+
   @Column({ unique: true })
   phone: string;
   @Column()

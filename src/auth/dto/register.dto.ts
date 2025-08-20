@@ -13,15 +13,6 @@ export class RegisterDto {
   username: string
 
   @ApiProperty({
-    description: "User email address",
-    example: "user@example.com",
-    format: "email",
-  })
-  @IsOptional()
-  @IsEmail()
-  email: string
-
-  @ApiProperty({
     description: "User password",
     example: "password123",
     minLength: 6,

@@ -10,6 +10,7 @@ import { AuthController } from './auth.controller';
 import { VerifyController } from './verify.controller';
 import { VerifyService } from './verify.service';
 import { Verify } from '~/entity/users/verify.entity';
+import { SmsService } from '~/services/sms.service';
 
 
 
@@ -23,7 +24,7 @@ import { Verify } from '~/entity/users/verify.entity';
     TypeOrmModule.forFeature([User, Verify]),
     // UserModule,
   ],
-  providers: [AuthService, JwtStrategy, RefreshJwtStrategy, VerifyService],
+  providers: [AuthService, JwtStrategy, RefreshJwtStrategy, VerifyService, SmsService],
   controllers: [AuthController, VerifyController],
   exports: [JwtStrategy, PassportModule, JwtModule],
 })

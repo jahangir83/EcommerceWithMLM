@@ -18,6 +18,12 @@ export class UserProfile implements ProfileInterface {
   @JoinColumn()
   user: User;
 
+  @Column({nullable:false})
+  fullName: string;
+
+  @Column({nullable:false})
+  email: string;
+
   @Column({ nullable: true })
   fatherName?: string;
 
@@ -65,13 +71,18 @@ export class UserProfile implements ProfileInterface {
 
   @Column({ nullable: true })
   houseNo?: string;
-  
+
   @Column({ nullable: true })
   postalCode?: string;
 
   @Column({ type: 'jsonb', nullable: true })
   extraInfo: JSON;
 
+  @Column({nullable:true})
+  nidFront: string;
+
+  @Column({nullable:true})
+  nidBack: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

@@ -21,7 +21,6 @@ export async function runSeed() {
   const systemAccounts: Account[] = [
     {
       username: "SuperAdmin",
-      email: "superadmin@system.com",
       phone: "0000000001",
       role: UserRole.ADMIN,
       status: UserStatus.ADVANCED_ACCESS_USER,
@@ -32,7 +31,6 @@ export async function runSeed() {
     },
     {
       username: "SystemAdmin",
-      email: "admin@system.com",
       phone: "0000000002",
       role: UserRole.ADMIN,
       status: UserStatus.ADVANCED_ACCESS_USER,
@@ -44,7 +42,6 @@ export async function runSeed() {
     },
     {
       username: "Developer",
-      email: "developer@system.com",
       phone: "+8801631551301",
       role: UserRole.DEVELOPER,
       status: UserStatus.ADVANCED_ACCESS_USER,
@@ -55,7 +52,6 @@ export async function runSeed() {
     },
     {
       username: "SystemVendor",
-      email: "vendor@system.com",
       phone: "0000000004",
       role: UserRole.VENDOR,
       status: UserStatus.ADVANCED_UDDOKTA,
@@ -69,11 +65,10 @@ export async function runSeed() {
   const createdUsers: User[] = []
 
   for (const accountData of systemAccounts) {
-    let user: User | null = await userRepo.findOneBy({ email: accountData.email! })
+    let user: User | null = await userRepo.findOneBy({ phone: accountData.phone! })
     if (!user) {
       user = userRepo.create({
         username: accountData.username!,
-        email: accountData.email!,
         phone: accountData.phone!,
         role: accountData.role!,
         status: accountData.status!,
@@ -89,9 +84,9 @@ export async function runSeed() {
       })
       await userRepo.save(user)
       createdUsers.push(user)
-      console.log(`✅ Created ${accountData.role} account: ${accountData.email}`)
+      console.log(`✅ Created ${accountData.role} account: ${accountData.phone}`)
     } else {
-      console.log(`⚠️  ${accountData.role} account already exists: ${accountData.email}`)
+      console.log(`⚠️  ${accountData.role} account already exists: ${accountData.phone}`)
     }
   }
 
@@ -172,11 +167,10 @@ export async function runSeed() {
 
   // Create platform system users
   for (const accountData of platformSystemAccounts) {
-    let user = await userRepo.findOneBy({ email: accountData.email })
+    let user = await userRepo.findOneBy({ phone: accountData.phone })
     if (!user) {
       user = userRepo.create({
         username: accountData.username,
-        email: accountData.email,
         phone: accountData.phone,
         role: accountData.role,
         status: accountData.status,

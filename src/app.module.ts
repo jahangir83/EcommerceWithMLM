@@ -53,7 +53,7 @@ import { Verify } from "./entity/users/verify.entity"
       },
     ]),
 
-     TypeOrmModule.forRootAsync({
+    TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
@@ -82,6 +82,7 @@ import { Verify } from "./entity/users/verify.entity"
           Shipment, // Added Shipment entity for fulfillment tracking
           Verify
         ],
+        migrations: [__dirname + "/migrations/*{.ts,.js}"],
       }),
     }),
 
@@ -102,6 +103,6 @@ import { Verify } from "./entity/users/verify.entity"
     ServicesModule, // Added ServicesModule for digital delivery and orchestration
   ],
   controllers: [AppController],
- 
+
 })
-export class AppModule {}
+export class AppModule { }

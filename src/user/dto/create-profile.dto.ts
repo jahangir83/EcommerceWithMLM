@@ -12,6 +12,13 @@ type CreateProfileDtoInterface = Omit<
 >;
 
 export class CreateProfileDto implements CreateProfileDtoInterface {
+
+  @IsString()
+  fullName: string;
+
+  @IsString()
+  email: string;
+
   @IsOptional()
   @IsString({ message: 'Father name must be a valid string.' })
   fatherName?: string;
@@ -83,4 +90,14 @@ export class CreateProfileDto implements CreateProfileDtoInterface {
   @IsOptional()
   @IsObject({ message: 'Extra info must be a valid JSON object.' })
   extraInfo?: JSON;
+
+  @IsOptional()
+  @IsString()
+  nidFront: string;
+
+  @IsOptional()
+  @IsString()
+  nidBack: string;
+
+  @IsOptional() @IsString() profilePhoto?: string;
 }

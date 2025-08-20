@@ -12,6 +12,7 @@ import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UserProfile, User } from '~/entity/index';
 import { UserRole } from '~/common/enums/role.enum';
+import { UserInterface } from '~/common/types/user.type';
 
 @Injectable()
 export class UserService {
@@ -38,17 +39,26 @@ export class UserService {
   }
 
   async createProfile(userId: string, profileDto: CreateProfileDto): Promise<UserProfile> {
-   
-      const user = await this.userRepo.findOne({
-        where: { id: userId },
-        relations: ['profile'],
-      });
 
-      if (!user) throw new NotFoundException('User not found!.');
-      if (user.profile) throw new BadRequestException('Profile already exists.');
+    const user = await this.userRepo.findOne({
+      where: { id: userId },
+      relations: ['profile'],
+    });
 
-      try { 
-        const profile = this.userProfileRepo.create({ ...profileDto, user });
+    if (!user) throw new NotFoundException('User not found!.');
+    if (user.profile) throw new BadRequestException('Profile already exists.');
+
+
+    // Check email uniqueness
+    const existingProfile = await this.userProfileRepo.findOne({
+      where: { email: profileDto.email },
+    });
+    if (existingProfile) {
+      throw new BadRequestException('Email is already in use.');
+    }
+
+    try {
+      const profile = this.userProfileRepo.create({ ...profileDto, user });
       return await this.userProfileRepo.save(profile);
     } catch (error) {
       throw new InternalServerErrorException(`Failed to create prodile: ${error.message}`);
@@ -56,15 +66,23 @@ export class UserService {
   }
 
   async updateProfile(userId: string, profileDto: UpdateProfileDto): Promise<UserProfile> {
-
-    const profile = await this.userProfileRepo.findOne({
-      where: { user: { id: userId } },
-    });
-
-    if (!profile) throw new NotFoundException(`User profile not found`);
-
-    Object.assign(profile, profileDto);
     try {
+      const profile = await this.userProfileRepo.findOne({
+        where: { user: { id: userId } },
+      });
+
+      if (!profile) {
+        const user = await this.userRepo.findOneBy({ id: userId })
+        if (!user) {
+          throw new NotFoundException(`User not found`);
+        }
+        const profile = this.userProfileRepo.create({ ...profileDto, user });
+        return await this.userProfileRepo.save(profile);
+
+      }
+
+      Object.assign(profile, profileDto);
+
       return await this.userProfileRepo.save(profile);
     } catch (error) {
       throw new InternalServerErrorException(error.message);
@@ -95,7 +113,6 @@ export class UserService {
         select: {
           id: true,
           username: true,
-          email: true,
           phone: true,
           role: true,
           isActive: true,

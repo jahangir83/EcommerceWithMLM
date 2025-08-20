@@ -1,11 +1,14 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
   Post,
   Put,
   Req,
+  UploadedFiles,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateProfileDto } from './dto/create-profile.dto';
@@ -16,6 +19,8 @@ import { Roles } from '../common/decorators/roles.decorator';
 import { UserRole } from '../common/enums/role.enum';
 import { AuthenticateRequest } from 'src/common/types/user.type';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
+import { ProfileUploadConfig } from '~/config/multer.config';
 
 @ApiTags('User')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -24,20 +29,41 @@ export class UserController {
   constructor(private readonly userService: UserService) { }
 
   @Post('profile/create')
-  @Roles(UserRole.ADMIN, UserRole.USER)
+  @Roles(UserRole.ADMIN, UserRole.USER, UserRole.DEVELOPER)
   @ApiOperation({ summary: 'Create user profile' })
   @ApiResponse({ status: 201, description: 'Profile created successfully.' })
   @ApiResponse({ status: 400, description: 'Profile already exists.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
+  @UseInterceptors(FileFieldsInterceptor([
+    { name: 'nidFront', maxCount: 1 },
+    { name: 'nidBack', maxCount: 1 },
+    { name: 'profilePhoto', maxCount: 1 },
+  ],
+    ProfileUploadConfig))
   async createProfile(
     @Body() profileDto: CreateProfileDto,
     @Req() req: AuthenticateRequest,
+    @UploadedFiles() files: {
+      nidFront?: Express.Multer.File[];
+      nidBack?: Express.Multer.File[];
+      profilePhoto?: Express.Multer.File[];
+    }
   ) {
-    // try {
+    try {
+      if (files?.nidFront?.[0]) {
+        profileDto.nidFront = files.nidFront[0].path;
+      }
+      if (files?.nidBack?.[0]) {
+        profileDto.nidBack = files.nidBack[0].path;
+      }
+      if (files?.profilePhoto?.[0]) {
+        profileDto.profilePhoto = files.profilePhoto[0].path;
+      }
+    } catch (error) {
+      throw new BadRequestException("File system error")
+    }
     return await this.userService.createProfile(req.user.id, profileDto);
-    // } catch (error) {
-    //   throw error;
-    // }
+
   }
 
   @Get('profile')
@@ -45,6 +71,9 @@ export class UserController {
   @ApiOperation({ summary: 'Get user profile' })
   @ApiResponse({ status: 200, description: 'Profile fetched successfully.' })
   @ApiResponse({ status: 404, description: 'Profile not found.' })
+
+
+
   async getProfile(@Req() req: AuthenticateRequest) {
     try {
       return await this.userService.getProfile(req.user.id);
@@ -58,11 +87,30 @@ export class UserController {
   @ApiOperation({ summary: 'Update user profile' })
   @ApiResponse({ status: 200, description: 'Profile updated successfully.' })
   @ApiResponse({ status: 404, description: 'Profile not found.' })
+  @UseInterceptors(FileFieldsInterceptor([
+    { name: 'nidFront', maxCount: 1 },
+    { name: 'nidBack', maxCount: 1 },
+    { name: 'profilePhoto', maxCount: 1 },
+  ],
+    ProfileUploadConfig))
+
   async updateProfile(
     @Body() profileDto: UpdateProfileDto,
     @Req() req: AuthenticateRequest,
+    @UploadedFiles() files: Express.Multer.File[],
   ) {
 
+    try {
+      if (files?.length) {
+        files.forEach(file => {
+          if (file.fieldname === 'nidFront') profileDto.nidFront = file.path;
+          if (file.fieldname === 'nidBack') profileDto.nidBack = file.path;
+          if (file.fieldname === 'profilePhoto') profileDto.profilePhoto = file.path;
+        });
+      }
+    } catch (error) {
+      throw new BadRequestException("File system error")
+    }
     return await this.userService.updateProfile(req.user.id, profileDto);
 
   }

@@ -37,6 +37,7 @@ export class AuthController {
   @ApiResponse({ status: 409, description: 'User already exists' })
   async register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
+
     /**TODO:
      * We need to generate totken if client want
      */
@@ -72,7 +73,6 @@ export class AuthController {
       const user = await this.authService.validateUser(dto);
       const tokens = await this.authService.issueTokens({
         id: user.id,
-        email: user.email,
         phone: user.phone,
         role: user.role
       });
@@ -125,7 +125,7 @@ export class AuthController {
   @UseGuards(JwtRefreshGuard)
   async refresh(@Req() req: any, @Res({ passthrough: true }) res: Response) {
     const { sub, email, role, phone } = req.user;
-    const tokens = await this.authService.issueTokens({ id: sub, email, role, phone });
+    const tokens = await this.authService.issueTokens({ id: sub, role, phone });
 
     // rotate refresh token in cookie
     res.cookie('refresh_token', tokens.refresh_token, {

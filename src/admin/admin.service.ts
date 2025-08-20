@@ -70,7 +70,7 @@ export class AdminService {
       this.userRepo.find({
         order: { createdAt: "DESC" },
         take: limit,
-        select: ["id", "username", "email", "createdAt", "role"],
+        select: ["id", "username",  "createdAt", "role"],
       }),
       this.orderRepo.find({
         relations: ["user"],

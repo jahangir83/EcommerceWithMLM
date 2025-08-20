@@ -17,6 +17,7 @@ import { CreateAdminDto } from './dto/admin.dto';
 import { LeaderShipDisignation } from '../entity/users/leadership-digisnation.entity';
 import { UserInactiveException } from '~/common/exceptions/user-inactive.exception';
 import { VerifyService } from './verify.service';
+import { Verify, VerifyType } from '~/entity/users/verify.entity';
 
 
 
@@ -30,6 +31,8 @@ export class AuthService {
     private dataSource: DataSource,
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
+    // @InjectRepository(Verify)
+    // private readonly verifyRepo: Repository<Verify>,
     private readonly jwtService: JwtService,
     private readonly verifyService: VerifyService,
   ) { }
@@ -49,7 +52,7 @@ export class AuthService {
     }
   }
 
-  async register(dto: RegisterDto): Promise<User> {
+  async register(dto: RegisterDto): Promise<any> {
     // --- STEP 1: Check for existing email or phone before attempting to create ---
     // const existingUserByEmail = await this.userRepo.findOneBy({
     //   email:dto.email
@@ -60,84 +63,84 @@ export class AuthService {
     // }
 
 
-    const existingUser = await this.userRepo.findOne({
-      where: [{ email: dto.email }, { phone: dto.phone }],
-    });
-
-    if (existingUser) {
-      if (existingUser.email === dto.email) {
-        throw new ConflictException('Email already registered');
-      }
-      if (existingUser.phone === dto.phone) {
-        throw new ConflictException('Phone number already registered');
-      }
-    }
-    const existingUserByPhone = await this.userRepo.findOne({
-      where: { phone: dto.phone },
-    });
-
-    if (existingUserByPhone) {
-      throw new ConflictException('Phone number already registered');
-    }
-    // --- END STEP 1 ---
-
-    let isActive = false;
-    let referredBy: User | null = null;
-
-    if (dto.referralCode) {
-      referredBy = await this.userRepo.findOne({
-        where: { referralCode: dto.referralCode },
+    try {
+      const existingUser = await this.userRepo.findOne({
+        where: { phone: dto.phone },
       });
 
-      if (!referredBy) {
-        throw new UnauthorizedException('Invalid referral code');
+      if (existingUser) {
+
+        return new ConflictException('Phone number already registered');
+
+      }
+
+      if (!await this.verifyService.isVerified(VerifyType.PHONE, dto.phone)) {
+        return new ConflictException("Phone number not verified yet.")
       }
 
 
+      // --- END STEP 1 ---
+
+      let isActive = false;
+      let referredBy: User | null = null;
+
+      if (dto.referralCode) {
+        referredBy = await this.userRepo.findOne({
+          where: { referralCode: dto.referralCode },
+        });
+
+        if (!referredBy) {
+          return new UnauthorizedException('Invalid referral code');
+        }
+
+
+      }
+      isActive = true; // User becomes active if referred
+      const hashed = await bcrypt.hash(dto.password, 10);
+
+      const user = this.userRepo.create({
+        username: dto.username,
+        phone: dto.phone,
+        password: hashed,
+        avatar: dto.avater,
+        isActive,
+        referredBy: referredBy ?? undefined,
+        referredById: referredBy?.id,
+        generation: referredBy ? referredBy.generation + 1 : 0,
+      });
+
+      // Save new user first
+      const { id, phone, role } = await this.userRepo.save(user);
+
+      // Update referrer's stats if exists
+      // This part should be wrapped in a transaction along with the newUser save
+      // for atomicity in a real application, but for now, this works.
+      if (referredBy) {
+        referredBy.totalDirectReferrals += 1;
+        await this.userRepo.save(referredBy);
+        // await this.updateLeadership(referredBy); // Call updateLeadership here
+      }
+
+      return this.issueTokens({ id, phone, role })
+
+    } catch (e) {
+      throw new BadRequestException("Register failed")
     }
-    isActive = true; // User becomes active if referred
-    const hashed = await bcrypt.hash(dto.password, 10);
 
-    const user = this.userRepo.create({
-      username: dto.username,
-      email: dto.email,
-      phone: dto.phone,
-      password: hashed,
-      avatar: dto.avater,
-      isActive,
-      referredBy: referredBy ?? undefined,
-      referredById: referredBy?.id,
-      generation: referredBy ? referredBy.generation + 1 : 0,
-    });
-
-    // Save new user first
-    const newUser = await this.userRepo.save(user);
-
-    // Update referrer's stats if exists
-    // This part should be wrapped in a transaction along with the newUser save
-    // for atomicity in a real application, but for now, this works.
-    if (referredBy) {
-      referredBy.totalDirectReferrals += 1;
-      await this.userRepo.save(referredBy);
-      // await this.updateLeadership(referredBy); // Call updateLeadership here
-    }
-
-    return newUser;
   }
 
 
 
-  async validateUser(dto: LoginDto): Promise<Pick<User, "id" | "phone" | "email" | "role" | "referralCode">> {
+  async validateUser(dto: LoginDto): Promise<Pick<User, "id" | "phone" |
+    "role" | "referralCode">> {
 
     const user = await this.userRepo.findOne({
-      where: [
-        { phone: dto.phone },
-        { email: dto.email }
-      ],
+      where: {
+        phone: dto.phone
+      },
       select: {
         id: true,
         phone: true,
-        email: true,
         role: true,
         referralCode: true,
         password: true,
@@ -153,10 +156,9 @@ export class AuthService {
       throw new UserInactiveException();
     }
 
-    const payload: Pick<User, "id" | "phone" | "email" | "role" | "referralCode"> = {
+    const payload: Pick<User, "id" | "phone" | "role" | "referralCode"> = {
       id: user.id,
       phone: user.phone,
-      email: user.email,
       role: user.role,
       referralCode: user.referralCode,
     };
@@ -166,8 +168,8 @@ export class AuthService {
   }
 
 
-  async issueTokens(user: Pick<User, "id" | "phone" | "email" | "role">) {
-    const payload = { sub: user.id, email: user.email, role: user.role, phone: user.phone };
+  async issueTokens(user: Pick<User, "id" | "phone" | "role">) {
+    const payload = { sub: user.id, role: user.role, phone: user.phone };
 
     const access_token = await this.jwtService.signAsync(payload, {
       secret: process.env.JWT_ACCESS_SECRET || 'access_secret_dev',
@@ -352,10 +354,8 @@ export class AuthService {
 
     // Check if an admin with the same phone or email already exists
     const existingAdmin = await this.userRepo.findOne({
-      where: [
-        { phone: dto.phone },
-        { email: dto.email }
-      ]
+      where: 
+        { phone: dto.phone }
     });
     if (existingAdmin) {
       throw new ConflictException('Admin with this phone or email already exists');
@@ -365,7 +365,6 @@ export class AuthService {
 
     const admin = this.userRepo.create({
       username: dto.username,
-      email: dto.email,
       phone: dto.phone,
       password: hashedPassword,
       avatar: dto.avatar,
