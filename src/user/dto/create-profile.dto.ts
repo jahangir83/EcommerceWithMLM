@@ -99,5 +99,14 @@ export class CreateProfileDto implements CreateProfileDtoInterface {
   @IsString()
   nidBack: string;
 
+  @IsOptional()
+  @IsString()
+  blood: string;
+
+  @IsOptional()
+  @IsString()
+  geolocation: string;
+
+
   @IsOptional() @IsString() profilePhoto?: string;
 }

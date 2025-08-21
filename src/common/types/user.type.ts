@@ -40,8 +40,8 @@ export interface UserInterface {
 
 export interface ProfileInterface {
   id: string;
-  fullName:string;
-  email:string;
+  fullName: string;
+  email: string;
   fatherName?: string;
   motherName?: string;
   birthDate?: Date;
@@ -62,8 +62,12 @@ export interface ProfileInterface {
   userId?: string;
   extraInfo?: JSON;
   user?: UserInterface; // optional and nullable
-  nidFront:string;
-  nidBack:string;
+  nidFront: string;
+  nidBack: string;
+
+  blood: string;
+  geolocation: string;
+
   createdAt: Date;
   updatedAt: Date;
 }
