@@ -6,6 +6,7 @@ import {
   Subscription,
   Uddokta,
 } from '~/entity/product-services';
+import { Nominee } from '~/entity/users/nominee.entity';
 
 export interface UserInterface {
   id: string;
@@ -28,6 +29,7 @@ export interface UserInterface {
   isEmailVerified?: boolean;
   isReferralCodeUsed?: boolean;
   profile?: ProfileInterface | null;
+  nominee?:Nominee | null
   subscriptionService?: Subscription | null; // optional and nullable
 
   uddokta?: Uddokta | null; // optional and nullable

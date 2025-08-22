@@ -21,6 +21,7 @@ import { Course, Subscription, Uddokta } from '../product-services';
 import { Payment } from '~/payments/entities/payment.entity';
 import { Order } from '~/orders/entities/order.entity';
 import { Verify } from './verify.entity';
+import { Nominee } from './nominee.entity';
 
 @Entity('users')
 export class User implements UserInterface {
@@ -75,6 +76,9 @@ export class User implements UserInterface {
 
   // subscriptions ... keep your mappings
   // ...
+
+  @OneToOne(() => Nominee, nominee => nominee.id)
+  nominee: Nominee;
 
   @OneToMany(() => Wallet, (w) => w.user) wallets: Wallet[];
   @OneToMany(() => Order, (o) => o.user) orders: Order[];

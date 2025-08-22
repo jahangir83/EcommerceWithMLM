@@ -218,4 +218,4 @@ export async function runSeed() {
   console.log("   - BonusPool: Special bonuses and rewards (25K money, 25K commission)")
 }
 
-runSeed()
+// runSeed()

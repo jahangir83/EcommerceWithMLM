@@ -20,7 +20,7 @@ export class VerifyService {
         user?: User,
         expiresInMinutes = 10
     ): Promise<Verify> {
-        const code = String(randomInt(100000, 999999));
+        const code = String(randomInt(1000, 9999));
         const expiresAt = new Date(Date.now() + expiresInMinutes * 60 * 1000);
 
         const verify = this.verifyRepo.create({

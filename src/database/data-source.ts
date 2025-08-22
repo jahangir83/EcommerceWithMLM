@@ -6,12 +6,14 @@ import { OrderItem } from '../orders/entities/order-item.entity';
 import { Order } from '../orders/entities/order.entity';
 import { Payment } from '../payments/entities/payment.entity';
 import { RevenueShare } from '../revenue/entities/revenue-share.entity';
+import { Nominee } from '../entity/users/nominee.entity';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
   url: process.env.DATABASE_URL ?? 'postgres://nest:nestjs@localhost:5432/nest',
   entities: [
     User,
+    Nominee,
     UserProfile,
     Wallet,
     AccountBalance,
@@ -36,4 +38,5 @@ export const AppDataSource = new DataSource({
   // migrations: ["src/database/migrations/*.ts"],
   synchronize: process.env.NODE_ENV === 'development',
   logging: process.env.NODE_ENV === 'development',
+
 });

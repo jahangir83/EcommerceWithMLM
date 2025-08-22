@@ -40,6 +40,7 @@ import { ServicesModule } from "./services/services.module"
 import { FulfilmentModule } from "./fulfilment/fulfilment.module"
 import { Shipment } from "./fulfilment/entities/shipment.entity"
 import { Verify } from "./entity/users/verify.entity"
+import { Nominee } from "./entity/users/nominee.entity"
 
 @Module({
   imports: [
@@ -59,35 +60,42 @@ import { Verify } from "./entity/users/verify.entity"
       useFactory: (configService: ConfigService) => ({
         type: "postgres",
         url: configService.get<string>("DATABASE_URL"),
-        synchronize: configService.get<string>("NODE_ENV") === "development",
+        synchronize:true,// configService.get<string>("NODE_ENV") === "development",
         logging: configService.get<string>("NODE_ENV") === "development",
-        entities: [
-          User,
-          UserProfile,
-          AccountBalance,
-          Wallet,
-          Order,
-          Payment,
-          Withdrawal,
-          Transaction,
-          Course,
-          Subscription,
-          Uddokta,
-          RevenueShare,
-          JournalEntry,
-          LeaderShipDisignation,
-          Product,
-          Category,
-          OrderItem,
-          Shipment, // Added Shipment entity for fulfillment tracking
-          Verify
-        ],
+        // entities: [
+        //   User,
+        //   UserProfile,
+        //   AccountBalance,
+        //   Wallet,
+        //   Order,
+        //   Payment,
+        //   Withdrawal,
+        //   Transaction,
+        //   Course,
+        //   Subscription,
+        //   Uddokta,
+        //   RevenueShare,
+        //   JournalEntry,
+        //   LeaderShipDisignation,
+        //   Product,
+        //   Category,
+        //   OrderItem,
+        //   Shipment, // Added Shipment entity for fulfillment tracking
+        //   Verify
+        // ],
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
         migrations: [__dirname + "/migrations/*{.ts,.js}"],
+        autoLoadEntities: true,
+        migrationsTableName:"migrations",
+        migrationsRun:true,
+        retryAttempts: 5,
+        retryDelay: 5000
       }),
     }),
 
     AuthModule,
     UserModule,
+    Nominee,
     ProductsModule,
     OrdersModule,
     PaymentsModule,
