@@ -18,7 +18,7 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { UserRole } from '../common/enums/role.enum';
 import { AuthenticateRequest } from 'src/common/types/user.type';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import { ProfileUploadConfig } from '~/config/multer.config';
 
@@ -34,6 +34,7 @@ export class UserController {
   @ApiResponse({ status: 201, description: 'Profile created successfully.' })
   @ApiResponse({ status: 400, description: 'Profile already exists.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
+  @ApiBody({type: CreateProfileDto})
   @UseInterceptors(FileFieldsInterceptor([
     { name: 'nidFront', maxCount: 1 },
     { name: 'nidBack', maxCount: 1 },
@@ -87,6 +88,7 @@ export class UserController {
   @ApiOperation({ summary: 'Update user profile' })
   @ApiResponse({ status: 200, description: 'Profile updated successfully.' })
   @ApiResponse({ status: 404, description: 'Profile not found.' })
+  @ApiBody({type:UpdateProfileDto})
   @UseInterceptors(FileFieldsInterceptor([
     { name: 'nidFront', maxCount: 1 },
     { name: 'nidBack', maxCount: 1 },
