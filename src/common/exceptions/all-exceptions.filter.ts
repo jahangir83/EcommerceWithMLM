@@ -5,8 +5,8 @@ import {
     HttpException,
     HttpStatus,
     BadRequestException,
-} from '@nestjs/common';
-import { Response, Request } from 'express';
+} from "@nestjs/common";
+import { Response, Request } from "express";
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -20,16 +20,14 @@ export class AllExceptionsFilter implements ExceptionFilter {
                 ? exception.getStatus()
                 : HttpStatus.INTERNAL_SERVER_ERROR;
 
-
         let message: any =
             exception instanceof HttpException
                 ? exception.getResponse()
-                : 'Internal server error'; 
+                : "Internal server error";
 
-        // 👇 Preserve ValidationPipe’s custom error format
         if (exception instanceof BadRequestException) {
             status = HttpStatus.BAD_REQUEST;
-            message = exception.getResponse(); // <-- keep your custom messages
+            message = exception.getResponse();
         }
 
         response.status(status).json({

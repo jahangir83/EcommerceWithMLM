@@ -53,16 +53,6 @@ export class AuthService {
   }
 
   async register(dto: RegisterDto): Promise<any> {
-    // --- STEP 1: Check for existing email or phone before attempting to create ---
-    // const existingUserByEmail = await this.userRepo.findOneBy({
-    //   email:dto.email
-    // });
-
-    // if (existingUserByEmail) {
-    //   throw new ConflictException('Email already registered');
-    // }
-
-
     try {
       const existingUser = await this.userRepo.findOne({
         where: { phone: dto.phone },
@@ -70,12 +60,12 @@ export class AuthService {
 
       if (existingUser) {
 
-        return new ConflictException('Phone number already registered');
+        throw new ConflictException('Phone number already registered');
 
       }
 
       if (!await this.verifyService.isVerified(VerifyType.PHONE, dto.phone)) {
-        return new ConflictException("Phone number not verified yet.")
+        throw new ConflictException("Phone number not verified yet.")
       }
 
 
@@ -90,7 +80,7 @@ export class AuthService {
         });
 
         if (!referredBy) {
-          return new UnauthorizedException('Invalid referral code');
+          throw new UnauthorizedException('Invalid referral code');
         }
 
 
@@ -124,7 +114,7 @@ export class AuthService {
       return this.issueTokens({ id, phone, role })
 
     } catch (e) {
-      throw new BadRequestException("Register failed")
+      throw e
     }
 
   }
@@ -354,7 +344,7 @@ export class AuthService {
 
     // Check if an admin with the same phone or email already exists
     const existingAdmin = await this.userRepo.findOne({
-      where: 
+      where:
         { phone: dto.phone }
     });
     if (existingAdmin) {

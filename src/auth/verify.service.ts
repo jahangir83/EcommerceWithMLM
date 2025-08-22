@@ -20,8 +20,22 @@ export class VerifyService {
         user?: User,
         expiresInMinutes = 10
     ): Promise<Verify> {
+
+        const previusOtp = await this.verifyRepo.find({
+            where: {
+                type: type,
+                value: value
+            }
+        })
+        // TODO: need to improvement
+        if (previusOtp) {
+            await this.verifyRepo.remove(previusOtp)
+        }
+
         const code = String(randomInt(1000, 9999));
         const expiresAt = new Date(Date.now() + expiresInMinutes * 60 * 1000);
+
+
 
         const verify = this.verifyRepo.create({
             type,

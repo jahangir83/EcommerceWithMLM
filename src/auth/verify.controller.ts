@@ -30,11 +30,11 @@ export class VerifyController {
     async phoneCode(@Body() dto: VerifyRequestDto) {
         try {
             const phoneVerify = await this.verifyService.requestVerify(dto.type, dto.value);
-            const sent = await this.smsService.sendSms(phoneVerify.value, phoneVerify.code);
+            // const sent = await this.smsService.sendSms(phoneVerify.value, phoneVerify.code);
 
-            if (!sent) {
-                throw new BadRequestException("Failed to send SMS");
-            }
+            // if (!sent) {
+            //     throw new BadRequestException("Failed to send SMS");
+            // }
 
             return { success: true, message: `OTP sent to your phone and your code (${phoneVerify.code})` };
         } catch (e) {
