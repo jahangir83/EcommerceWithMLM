@@ -3,6 +3,14 @@ import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString, IsUUID, Matches } from 'class-validator';
 
 export class CreateNomineeDto {
+
+    @ApiProperty({
+        example:"Name"
+    })
+    @IsNotEmpty()
+    @IsString()
+    name:string
+
     @ApiProperty({
         example: '+88017XXXXXXXX',
         description: 'Nominee phone number (Bangladesh), +88 is optional'

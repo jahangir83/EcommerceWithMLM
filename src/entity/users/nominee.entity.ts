@@ -10,6 +10,9 @@ export class Nominee {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
+    @Column()
+    name:string
+
     @Column({ nullable: false })
     phone: string;
 

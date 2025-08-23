@@ -111,7 +111,7 @@ export class CreateProfileDto implements CreateProfileDtoInterface {
     type:"array"
   })
   @IsOptional()
-  @IsObject({ message: 'Extra info must be a valid JSON object.' })
+  @IsString()
   extraInfo?: JSON;
 
   @ApiPropertyOptional({ example: 'nid-front.png', description: 'Front side of NID (image path or URL)' })

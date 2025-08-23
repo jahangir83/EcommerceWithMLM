@@ -8,9 +8,9 @@ import { SmsService } from "~/services/sms.service";
 @Controller("verify")
 export class VerifyController {
     constructor(
-        private readonly verifyService: VerifyService, 
+        private readonly verifyService: VerifyService,
         private readonly smsService: SmsService
-    ) {}
+    ) { }
 
     // 🔹 Universal request endpoint
     @Post("request")
@@ -30,6 +30,7 @@ export class VerifyController {
     async phoneCode(@Body() dto: VerifyRequestDto) {
         try {
             const phoneVerify = await this.verifyService.requestVerify(dto.type, dto.value);
+            // TODO: Sms system intregation 
             // const sent = await this.smsService.sendSms(phoneVerify.value, phoneVerify.code);
 
             // if (!sent) {

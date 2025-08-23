@@ -34,7 +34,7 @@ export class UserService {
 
       return profile;
     } catch (error) {
-      throw new InternalServerErrorException(error.message);
+      throw error;
     }
   }
 

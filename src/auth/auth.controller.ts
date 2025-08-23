@@ -68,6 +68,7 @@ export class AuthController {
   })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   @Post('login')
+   @HttpCode(HttpStatus.OK)
   async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
     try {
       const user = await this.authService.validateUser(dto);
@@ -142,12 +143,18 @@ export class AuthController {
     };
   }
 
-  @Get('seed')
-  async runSystemSeed() {
-    try {
-      return runSeed()
-    } catch (error) {
-      throw new BadRequestException(`System seed failed`)
-    }
-  }
+
+  // @
+  // async forgetPassword(){
+
+  // }
+
+  // @Get('seed')
+  // async runSystemSeed() {
+  //   try {
+  //     return runSeed()
+  //   } catch (error) {
+  //     throw new BadRequestException(`System seed failed`)
+  //   }
+  // }
 }

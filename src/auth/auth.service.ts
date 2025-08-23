@@ -111,7 +111,11 @@ export class AuthService {
         // await this.updateLeadership(referredBy); // Call updateLeadership here
       }
 
-      return this.issueTokens({ id, phone, role })
+      const {access_token, expires_in, token_type} = await  this.issueTokens({ id, phone, role })
+      return {
+        id:user.id,
+        
+      }
 
     } catch (e) {
       throw e
