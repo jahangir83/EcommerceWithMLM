@@ -44,7 +44,7 @@ import { Nominee } from "./entity/users/nominee.entity"
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
+    ConfigModule.forRoot({ 
       isGlobal: true,
     }),
     ThrottlerModule.forRoot([

@@ -43,6 +43,11 @@ export class NomineeService {
     return nominee;
   }
 
+  async findByUserId(userId: string): Promise<Nominee | null> {
+    if(!userId) return null;
+    return this.nomineeRepo.findOne({ where: { user: { id: userId } } });
+  }
+
   async update(id: string, dto: UpdateNomineeDto): Promise<Nominee> {
     const nominee = await this.findOne(id);
 

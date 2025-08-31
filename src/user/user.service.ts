@@ -13,6 +13,7 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UserProfile, User } from '~/entity/index';
 import { UserRole } from '~/common/enums/role.enum';
 import { UserInterface } from '~/common/types/user.type';
+import { NomineeService } from './nominee.service';
 
 @Injectable()
 export class UserService {
@@ -21,6 +22,7 @@ export class UserService {
     private readonly userRepo: Repository<User>,
     @InjectRepository(UserProfile)
     private readonly userProfileRepo: Repository<UserProfile>,
+    private readonly nomineeService: NomineeService
   ) { }
 
   async getProfile(userId: string): Promise<UserProfile> {
@@ -28,11 +30,106 @@ export class UserService {
       const profile = await this.userProfileRepo.findOne({
         where: { user: { id: userId } },
         relations: ['user'],
+        select:{
+          user:{
+            id:true,
+            username:true,
+            phone:true,
+            referralCode:true
+          }
+        }
       });
 
       if (!profile) throw new NotFoundException('Profile not found!.');
 
       return profile;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getProfileForMobile(userId: string): Promise<any> {
+    try {
+      const profile = await this.userProfileRepo.findOne({
+        where: { user: { id: userId } },
+        relations: ['user'],
+        select:{
+          user:{
+            id:true,
+            username:true,
+            phone:true,
+            referralCode:true
+          }
+        }
+      });
+
+      if (!profile) throw new NotFoundException('Profile not found!.');
+
+      const nominee = await this.nomineeService.findByUserId(profile.user.id);
+      // Destructure to for module system
+      //1, Prymary Info
+      //2, personal Info
+      //3, Documents
+      //4, address Info
+      //5, Nominee Info
+      //6, Vision Info
+      //7, Extra Info
+
+      const user = profile.user;
+      const { username, phone, referralCode } = user;
+
+      const primaryInfo = {
+        fullName: profile.fullName,
+        email: profile.email,
+        phone,
+        referralCode
+      };
+
+      const personalInfo = {
+        fatherName: profile.fatherName,
+        motherName: profile.motherName,
+        dateOfBirth: profile.birthDate,
+        gender: profile.gender,
+        religion: profile.religion,
+        blood: profile.blood,
+        maritalStatus: profile.maritalStatus,
+      };
+
+      const documents = {
+        // nidNumber: profile.nidNumber,
+        nidFront: profile.nidFront,
+        nidBack: profile.nidBack,
+        // birthCertificate: profile.birthCertificate,
+        // passportNumber: profile.passportNumber,
+        // drivingLicense: profile.drivingLicense,
+      };
+
+      const addressInfo = {
+        geolocation: profile.geolocation,
+        divistion: profile.division,
+        district: profile.district,
+        upazila: profile.upazila,
+        union: profile.union,
+        postOffice: profile.postOffice,
+        village: profile.village,
+        extraInfo: profile.extraInfo
+      };
+
+      const nomineeInfo = nominee ? {
+        name: nominee.name,
+        relation: nominee.relation,
+        phone: nominee.phone,
+        nidNumber: nominee.nidNumber,
+      } : {};
+
+      return {
+        user: profile.user,
+        personalInfo: personalInfo,
+        primaryInfo: primaryInfo,
+        addressInfo: addressInfo,
+        nomineeInfo: nomineeInfo,
+        documents: documents,
+      }
     } catch (error) {
       throw error;
     }

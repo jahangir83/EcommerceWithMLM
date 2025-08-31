@@ -83,6 +83,19 @@ export class UserController {
     }
   }
 
+@Get('profile/mobile')
+  @Roles(UserRole.ADMIN, UserRole.USER, UserRole.VENDOR)
+  @ApiOperation({ summary: 'Get user profile for mobile' })
+  @ApiResponse({ status: 200, description: 'Profile fetched successfully.' })
+  @ApiResponse({ status: 404, description: 'Profile not found.' })
+    async getProfileForMobile(@Req() req: AuthenticateRequest) {
+    try {
+      return await this.userService.getProfileForMobile(req.user.id);
+    } catch (error) {
+      throw error;
+    }
+  }
+
   @Put('profile/update')
   @Roles(UserRole.ADMIN, UserRole.USER)
   @ApiOperation({ summary: 'Update user profile' })

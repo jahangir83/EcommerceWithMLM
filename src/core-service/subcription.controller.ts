@@ -45,7 +45,7 @@ export class SubscriptionController {
     });
 
     if (subscription) {
-      throw new ConflictException(`Subscription with status ${dto.serviceStatus} already exists`);
+      throw new ConflictException(`Subscription with status ${dto.serviceName} already exists`);
     }
     return this.service.create(dto);
   }

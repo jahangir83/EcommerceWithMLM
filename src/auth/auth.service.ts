@@ -8,7 +8,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entity/index';
-import { DataSource, Or, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { RegisterDto } from './dto/register.dto';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
@@ -111,10 +111,10 @@ export class AuthService {
         // await this.updateLeadership(referredBy); // Call updateLeadership here
       }
 
-      const {access_token, expires_in, token_type} = await  this.issueTokens({ id, phone, role })
+      const { access_token, expires_in, token_type } = await this.issueTokens({ id, phone, role })
       return {
-        id:user.id,
-        
+        id: user.id,
+
       }
 
     } catch (e) {
@@ -129,9 +129,12 @@ export class AuthService {
     "role" | "referralCode">> {
 
     const user = await this.userRepo.findOne({
-      where: {
-        phone: dto.phone
-      },
+      where: [
+        {
+          phone: dto.phone
+        },
+        { phone: `+88${dto.phone}` }
+      ],
       select: {
         id: true,
         phone: true,

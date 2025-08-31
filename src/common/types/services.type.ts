@@ -18,3 +18,13 @@ export interface ServiceInterface {
     createdAt: Date;
     updatedAt: Date;
 }
+
+export interface GenerationInterface {
+    price: string;
+    serviceName: string;
+    type: string;
+    serviceStatus: UserStatus;
+    description?: string;
+    image?: string;
+    isActive?: boolean;
+}
