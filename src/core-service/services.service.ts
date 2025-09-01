@@ -6,6 +6,10 @@ export class ServicesCrudService<T extends object> {
   constructor(private readonly repo: Repository<T>) { }
 
   create(data: any): Promise<T> {
+
+
+
+
     const entity = this.repo.create(data);
     // Ensure entity is not an array before saving
     if (Array.isArray(entity)) {

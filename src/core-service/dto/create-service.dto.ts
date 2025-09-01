@@ -1,50 +1,63 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNumberString, IsOptional, IsEnum, IsBoolean, IsNumber } from 'class-validator';
-import { UserStatus } from '~/common/enums/common.enum';
+// src/modules/courses/dto/create-course.dto.ts
+import { ApiProperty } from "@nestjs/swagger";
+import { IsBoolean, IsEnum, IsOptional, IsString, ValidateNested, IsArray } from "class-validator";
+import { Type } from "class-transformer";
+import { UserStatus } from "~/common/enums/common.enum";
+
+class GenerationPriceDto {
+  @ApiProperty()
+  generation: number;
+
+  @ApiProperty()
+  price: number;
+
+  @ApiProperty()
+  content: string;
+}
 
 export class CreateServiceDto {
-    @ApiProperty({ example: 'Subcription or Uddokta or Course', description: 'Name of the  service name' })
-    @IsString()
-    @IsString()
-    serviceName: string;
+  @ApiProperty()
+  @IsString()
+  price: string;
 
-    @ApiProperty({ example: 29.99, description: 'Price of the subscription' })
-    @IsNumber()
-    @IsNumberString()
-    price: string;
+  @ApiProperty()
+  @IsString()
+  serviceName: string;
 
-    @ApiProperty({ example: 'monthly', description: 'Billing type or cycle' })
-    @IsString()
-    @IsString()
-    type: string;
+  @ApiProperty()
+  @IsString()
+  type: string;
 
-    @ApiProperty({ enum: UserStatus, default: UserStatus.ADVANCED_ACCESS_USER })
-    @IsEnum(UserStatus)
-    @IsEnum(UserStatus)
-    serviceStatus: UserStatus;
+  @ApiProperty({ enum: UserStatus, default: UserStatus.ADVANCED_ASSOCIATE })
+  @IsEnum(UserStatus)
+  serviceStatus: UserStatus;
 
-    @ApiProperty({ example: 'Access to all premium features', required: false })
-    @IsOptional()
-    @IsString()
-    @IsOptional()
-    @IsString()
-    description?: string;
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  description?: string;
 
-    @ApiProperty({ example: 'https://example.com/image.png', required: false })
-    @IsOptional()
-    @IsString()
-    @IsOptional()
-    @IsString()
-    image?: string;
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  image?: string;
 
+  @ApiProperty({ default: true })
+  @IsBoolean()
+  isActive: boolean;
 
-    @ApiProperty({ default: true })
-    @IsOptional()
-    @IsBoolean()
-    @IsOptional()
-    @IsBoolean()
-    isActive?: boolean;
+  @ApiProperty({ type: [GenerationPriceDto], required: false })
+//   @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => GenerationPriceDto)
+  generationPrice: GenerationPriceDto[];
+
+  @ApiProperty({ default: false })
+  @IsBoolean()
+  isGenerationPriceActive: boolean;
 }
+
 
 
 export class CreateUddoktaDto extends CreateServiceDto {
@@ -74,5 +87,4 @@ export class UpdateCourseDto extends UpdateServiceDto {
 }
 
 export class UpdateSubscriptionDto extends UpdateServiceDto {
-
-}
+}    

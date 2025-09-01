@@ -1,15 +1,15 @@
+// src/entity/course.entity.ts
 import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToOne,
   OneToMany,
   Entity,
 } from 'typeorm';
-import { ServiceInterface } from '~/common/types/services.type';
 import { User } from '../users/user.entity';
 import { UserStatus } from '~/common/enums/common.enum';
+import { generationPriceInterface, ServiceInterface } from '~/common/types/services.type';
 
 @Entity()
 export class Course implements ServiceInterface {
@@ -24,7 +24,7 @@ export class Course implements ServiceInterface {
 
   @Column()
   type: string;
-  
+
   @Column({
     type: 'enum',
     enum: UserStatus,
@@ -41,6 +41,12 @@ export class Course implements ServiceInterface {
   @Column({ default: true })
   isActive: boolean;
 
+  @Column({ type: 'json', nullable: true })
+  generationPrice?: generationPriceInterface[];
+
+  @Column({ type: 'boolean', default: false })
+  isGenerationPriceActive: boolean;
+
   @OneToMany(() => User, (user) => user.course, { cascade: true })
   users: User[];
 
@@ -50,69 +56,3 @@ export class Course implements ServiceInterface {
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 }
-
-
-/**
- * import {
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  OneToOne,
-  OneToMany,
-  Entity,
-} from 'typeorm';
-import { ServiceInterface } from '~/common/types/services.type';
-import { User } from '../users/user.entity';
-import { UserStatus } from '~/common/enums/common.enum';
-import { Expose } from 'class-transformer';
-
-@Entity()
-export class Course implements ServiceInterface {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
-  @Expose()
-  @Column()
-  price: string;
-
-  @Expose()
-  @Column()
-  serviceName: string;
-
-  @Expose()
-  @Column()
-  type: string;
-
-  @Expose()
-  @Column({
-    type: 'enum',
-    enum: UserStatus,
-    default: UserStatus.ADVANCED_ASSOCIATE,
-  })
-  serviceStatus: UserStatus;
-
-  @Expose()
-  @Column({ nullable: true })
-  description?: string;
-
-  @Expose()
-  @Column({ nullable: true })
-  image?: string;
-
-  @Expose()
-  @Column({ default: true })
-  isActive: boolean;
-
-  @Expose()
-  @OneToMany(() => User, (user) => user.course, { cascade: true })
-  users: User[];
-
-  @CreateDateColumn({ type: 'timestamp' })
-  createdAt: Date;
-
-  @UpdateDateColumn({ type: 'timestamp' })
-  updatedAt: Date;
-}
-
- */

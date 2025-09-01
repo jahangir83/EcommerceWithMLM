@@ -11,6 +11,7 @@ import {
 import { Category } from "./category.entity"
 import { User } from "../users"
 import { OrderItem } from "~/orders/entities/order-item.entity"
+import { generationPriceInterface } from "~/common/types/services.type"
 
 
 export enum ProductType {
@@ -91,6 +92,12 @@ export class Product {
 
   @Column({ default: 0 })
   salesCount: number
+
+  @Column({ type: 'json', nullable: true })
+  generationPrice: generationPriceInterface[];
+
+  @Column({ type: 'boolean', default: false })
+  isGenerationPriceActive: boolean
 
   @Column("decimal", { precision: 3, scale: 2, default: 0 })
   rating: number

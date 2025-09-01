@@ -28,18 +28,20 @@ import {
   ApiOperation,
   ApiResponse,
 } from '@nestjs/swagger';
+import { CourseService } from './services/course.service';
 
 @ApiTags('Courses')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('courses')
 export class CourseController {
-  private service: ServicesCrudService<Course>;
+
 
   constructor(
     @InjectRepository(Course)
     private readonly repo: Repository<Course>,
+    private readonly service: CourseService
   ) {
-    this.service = new ServicesCrudService<Course>(this.repo);
+    
   }
 
   @Post('create')

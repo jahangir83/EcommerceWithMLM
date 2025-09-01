@@ -7,7 +7,7 @@ import {
   OneToMany,
   Entity,
 } from 'typeorm';
-import { ServiceInterface } from '~/common/types/services.type';
+import { generationPriceInterface, ServiceInterface } from '~/common/types/services.type';
 import { User } from '../users/user.entity';
 import { UserStatus } from '~/common/enums/common.enum';
 
@@ -40,6 +40,14 @@ export class Subscription implements ServiceInterface {
 
   @Column({ nullable: true })
   description?: string;
+
+
+  @Column({ type: 'json', nullable: true })
+  generationPrice: generationPriceInterface[];
+
+
+  @Column({ type: 'boolean', default: false })
+  isGenerationPriceActive: boolean
 
   @OneToMany(() => User, (user: User) => user.subscription, {
     cascade: true,
