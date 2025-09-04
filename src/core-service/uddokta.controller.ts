@@ -17,7 +17,6 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { CreateCourseDto, UpdateCourseDto } from './dto/create-service.dto';
-import { ServicesCrudService } from './services.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Uddokta } from '~/entity';
@@ -26,19 +25,19 @@ import { RolesGuard } from '~/common/guards/roles.guard';
 import { Roles } from '~/common/decorators/roles.decorator';
 import { UserRole } from '~/common/enums/role.enum';
 import { UserStatus } from '~/common/enums/common.enum';
+import { UddoktaService } from './services/uddokta.service';
 
 @ApiTags('uddokta')
 @ApiBearerAuth() // shows lock icon in Swagger UI (JWT protected)
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('uddokta')
 export class UddoktaController {
-  private service: ServicesCrudService<Uddokta>;
 
   constructor(
     @InjectRepository(Uddokta)
     private readonly repo: Repository<Uddokta>,
+    private readonly service: UddoktaService
   ) {
-    this.service = new ServicesCrudService<Uddokta>(this.repo);
   }
 
   @Post('create')
@@ -66,6 +65,14 @@ export class UddoktaController {
   @ApiResponse({ status: 200, description: 'List of Uddoktas returned' })
   findAll() {
     return this.service.findAll();
+  }
+
+  @Get('buyers')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Get all Uddokta buyers (Admin only)' })
+  @ApiResponse({ status: 200, description: 'List of all Uddokta buyers.' })
+  findAllBuyers() {
+    return this.service.findAllBuyers();
   }
 
   @Get(':id')

@@ -7,7 +7,7 @@ export interface ServiceInterface {
     id: string;
     price: string;
     serviceName: string;
-    type: 'online'|'offline'|'hybrid';
+    type: string;
     serviceStatus: UserStatus;
     description?: string;
     image?: string;

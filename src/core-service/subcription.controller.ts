@@ -11,7 +11,6 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { CreateSubscriptionDto, UpdateSubscriptionDto } from './dto/create-service.dto';
-import { ServicesCrudService } from './services.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Subscription } from '~/entity';
@@ -20,18 +19,20 @@ import { JwtAuthGuard } from '~/common/guards/jwt-auth.guard';
 import { RolesGuard } from '~/common/guards/roles.guard';
 import { Roles } from '~/common/decorators/roles.decorator';
 import { UserRole } from '~/common/enums/role.enum';
+import { SubscriptionService } from './services/supcription.service';
 
 @ApiTags('subscriptions')
 @Controller('subscriptions')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class SubscriptionController {
-  private service: ServicesCrudService<Subscription>;
+
 
   constructor(
     @InjectRepository(Subscription)
     private readonly repo: Repository<Subscription>,
+    private readonly service: SubscriptionService
   ) {
-    this.service = new ServicesCrudService<Subscription>(this.repo);
+   
   }
 
   @Post()
@@ -55,6 +56,14 @@ export class SubscriptionController {
   @ApiResponse({ status: 200, description: 'List of subscriptions' })
   findAll() {
     return this.service.findAll();
+  }
+
+  @Get('buyers')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Get all subscription buyers (Admin only)' })
+  @ApiResponse({ status: 200, description: 'List of all subscription buyers.' })
+  findAllBuyers() {
+    return this.service.findAllBuyers();
   }
 
   @Get(':id')

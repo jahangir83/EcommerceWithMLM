@@ -9,6 +9,8 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody } from "@nes
 import { JwtRefreshGuard } from "../common/guards/jwt-refresh.guard"
 import { UserInactiveException } from "~/common/exceptions/user-inactive.exception"
 import { runSeed } from "~/database/seeds/seed-system-accounts"
+import { AuthenticateRequest } from "~/common/types/user.type"
+import { ExceptionsHandler } from "@nestjs/core/exceptions/exceptions-handler"
 
 @Controller("auth")
 @ApiTags("Authentication")
@@ -143,6 +145,38 @@ export class AuthController {
     };
   }
 
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
+  @Get('session-validate')
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Validate current session' })
+  @ApiResponse({
+    status: 200,
+    description: 'Session is valid',
+    schema: {
+      example: {
+        message: 'Session is valid',
+        user: {
+          id: 1,
+          email: 'user@example.com',
+          phone: "+8801631551301",
+          role: 'USER',
+          profile: {
+            firstName: 'John',
+            lastName: 'Doe'
+          }
+        }
+      }
+    }
+  })
+  @ApiResponse({ status: 401, description: 'Invalid token' })
+  async sessionValidate(@Req() req: AuthenticateRequest) {
+    try{
+      return this.authService.sessionValidate(req.user.id)
+    }catch(error:any){
+      throw error
+    }
+  }
 
   // @
   // async forgetPassword(){

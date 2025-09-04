@@ -92,7 +92,7 @@ export class AuthService {
         username: dto.username,
         phone: dto.phone,
         password: hashed,
-        avatar: dto.avater,
+        avatar: dto.avatar,
         isActive,
         referredBy: referredBy ?? undefined,
         referredById: referredBy?.id,
@@ -111,10 +111,22 @@ export class AuthService {
         // await this.updateLeadership(referredBy); // Call updateLeadership here
       }
 
-      const { access_token, expires_in, token_type } = await this.issueTokens({ id, phone, role })
+      const { access_token, expires_in, token_type, refresh_token } = await this.issueTokens({ id, phone, role })
       return {
-        id: user.id,
+        user: {
+          id: user.id,
+          role: user.role,
+          username: user.username,
+          phone: user.phone,
+          avatar: user.avatar,
+          referralCode: user.referralCode,
+          isActive: user.isActive,
 
+        },
+        access_token,
+        expires_in,
+        token_type,
+        refresh_token
       }
 
     } catch (e) {
@@ -416,6 +428,24 @@ export class AuthService {
     // For demonstration, we'll just return a dummy token.
     const token = this.jwtService.sign({ ...dto });
     return { token };
+  }
+
+  async sessionValidate(userId: string) {
+    const user = await this.userRepo.findOne({ where: { id: userId } })
+    if (!user) {
+      throw new NotFoundException("User not found!")
+    }
+
+    return {
+        id: user.id,
+        role: user.role,
+        username: user.username,
+        phone: user.phone,
+        avatar: user.avatar,
+        referralCode: user.referralCode,
+        isActive: user.isActive,
+      
+    }
   }
 
 }

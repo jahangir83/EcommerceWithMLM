@@ -1,17 +1,22 @@
 // src/modules/courses/dto/create-course.dto.ts
 import { ApiProperty } from "@nestjs/swagger";
-import { IsBoolean, IsEnum, IsOptional, IsString, ValidateNested, IsArray } from "class-validator";
+import { IsBoolean, IsEnum, IsOptional, IsString, ValidateNested, IsArray, IsNumber } from "class-validator";
 import { Type } from "class-transformer";
 import { UserStatus } from "~/common/enums/common.enum";
+import { generationPriceInterface } from "~/common/types/services.type";
+import { PartialType } from "@nestjs/mapped-types";
 
-class GenerationPriceDto {
+class GenerationPriceDto implements generationPriceInterface {
   @ApiProperty()
+  @IsNumber()
   generation: number;
 
   @ApiProperty()
+  @IsNumber()
   price: number;
 
   @ApiProperty()
+  @IsString()
   content: string;
 }
 
@@ -47,7 +52,7 @@ export class CreateServiceDto {
   isActive: boolean;
 
   @ApiProperty({ type: [GenerationPriceDto], required: false })
-//   @IsOptional()
+  //   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => GenerationPriceDto)
@@ -61,30 +66,25 @@ export class CreateServiceDto {
 
 
 export class CreateUddoktaDto extends CreateServiceDto {
-    // Additional properties specific to Uddokta can be added here
+  // Additional properties specific to Uddokta can be added here
 }
 
 export class CreateCourseDto extends CreateServiceDto {
-    // Additional properties specific to Course can be added here
+  // Additional properties specific to Course can be added here
 }
 
 export class CreateSubscriptionDto extends CreateServiceDto {
-    // Additional properties specific to Subscription can be added here
+  // Additional properties specific to Subscription can be added here
 }
 
 export class UpdateServiceDto extends CreateServiceDto {
-    @IsOptional()
-    @IsString()
-    id?: string; // ID of the service to update
+  @IsOptional()
+  @IsString()
+  id?: string; // ID of the service to update
 }
 
-export class UpdateUddoktaDto extends UpdateServiceDto {
+export class UpdateUddoktaDto extends PartialType(UpdateServiceDto) { }
 
-}
+export class UpdateCourseDto extends PartialType(UpdateServiceDto) { }
 
-export class UpdateCourseDto extends UpdateServiceDto {
-
-}
-
-export class UpdateSubscriptionDto extends UpdateServiceDto {
-}    
+export class UpdateSubscriptionDto extends PartialType(UpdateServiceDto) { }

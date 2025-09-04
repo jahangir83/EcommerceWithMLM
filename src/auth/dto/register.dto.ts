@@ -31,7 +31,7 @@ export class RegisterDto {
 
   @IsOptional()
   @IsString()
-  avater: string
+  avatar: string
 
   @ApiPropertyOptional({
     description: "Referral code from existing user",

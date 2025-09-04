@@ -19,11 +19,51 @@ export class CourseService {
     }
 
     async findAll(): Promise<Course[]> {
-        return await this.courseRepo.find({ relations: ["users"] });
+        return await this.courseRepo.find({
+            select: {
+                id: true, serviceName: true,
+                price: true,
+                description: true,
+                image: true,
+                isActive: true,
+                createdAt: true,
+                updatedAt: true,
+                serviceStatus: true,
+                type: true,
+                generationPrice: true,
+                isGenerationPriceActive: true,
+            }
+        });
+    }
+
+    async findAllBuyers(): Promise<Course[]> {
+        return await this.courseRepo.find({
+            where: { isActive: true }, relations: ["users"], select: {
+                users: {
+                    id: true,
+                    username: true,
+                    phone: true,
+                }
+            }
+        });
     }
 
     async findOne(id: string): Promise<Course> {
-        const course = await this.courseRepo.findOne({ where: { id }, relations: ["users"] });
+        const course = await this.courseRepo.findOne({
+            where: { id }, select: {
+                id: true, serviceName: true,
+                price: true,
+                description: true,
+                image: true,
+                isActive: true,
+                createdAt: true,
+                updatedAt: true,
+                serviceStatus: true,
+                type: true,
+                generationPrice: true,
+                isGenerationPriceActive: true,
+            }
+        });
         if (!course) throw new NotFoundException("Course not found");
         return course;
     }
